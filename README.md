@@ -1,2 +1,2 @@
-# YOLOL_Simulator
+# YOLOL Simulator
 A YOLOL simulator that parses YOLOL code with Python and displays a scenario using Pygame
