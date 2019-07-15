@@ -8,6 +8,7 @@ Author: StolenLight
 This class simulates the funtionality of a Lamp in Starbase.
 """
 
+
 class Lamp():
     def __init__(self, input_settings):
         """
@@ -16,7 +17,7 @@ class Lamp():
                 value, and range.
         """
         settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 200,
-            'saturation': 0.5, 'value': 0.5, 'range': 10}
+                    'saturation': 0.5, 'value': 0.5, 'range': 10}
 
         for set in settings.keys():
             if set in input_settings:

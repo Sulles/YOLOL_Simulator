@@ -17,6 +17,7 @@ for root, dirs, files in os.walk("/mydir"):
 
 import os
 
+
 # This is the sub-class
 class _chip():
     def __init__(self, yolol_code, wait=0):

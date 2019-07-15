@@ -1,2 +1,4 @@
-.git
-.pyc
+*.git
+*.pyc
+*.xml
+*.iml

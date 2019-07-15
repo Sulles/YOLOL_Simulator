@@ -10,6 +10,7 @@ three types of buttons, all buttons will have a subclass to inherit all common
 features
 """
 
+
 # This is the sub-class
 class _button():
     def __init__(self, name, state, on_state, off_state, style):
@@ -39,8 +40,8 @@ class _button():
               "Current State: {1}\n"
               "On State: {2}\n"
               "Off State: {3}".format(
-              self.name, self.ButtonState, self.ButtonOnState,
-              self.ButtonOffState))
+            self.name, self.ButtonState, self.ButtonOnState,
+            self.ButtonOffState))
 
 
 # This is the main button class
@@ -48,14 +49,14 @@ class _button():
 class Button(_button):
     def __init__(self, input_settings):
         settings = {'name': "", 'state': 0, 'on_state': 1,
-            'off_state': 0, 'style': 0}
+                    'off_state': 0, 'style': 0}
 
         for set in settings.keys():
             if set in input_settings:
                 settings[set] = input_settings[set]
 
         _button.__init__(self, settings['name'], settings['state'],
-            settings['on_state'], settings['off_state'], settings['style'])
+                         settings['on_state'], settings['off_state'], settings['style'])
 
 
 # Unit test

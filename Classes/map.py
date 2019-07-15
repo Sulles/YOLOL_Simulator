@@ -13,9 +13,9 @@ For Example: YOLOL code has line...
 This function knows that a Button object is expected
 """
 
-from Button import Button
-from Chip import Chip
-from Lamp import Lamp
+from .Button import Button
+from .Chip import Chip
+from .Lamp import Lamp
 
 obj_map = {
     "Button": Button,
@@ -27,17 +27,16 @@ func_map = {
     "CargoBeam": ['CargoBeamOnState', 'CargoBeamSearchLength'],
     "FixedMount": ['CurrentState', 'OnState', 'OffState', 'ButtonStyle'],
     "Generator": ['FuelChamberFuel', 'FuelChamberMaxFuel',
-        'FuelChamberUnitRateLimit', 'FuelChamberUnitRate',
-        'GeneratorUnitRateLimit', 'GeneratorUnitRate', 'StoredCoolant',
-        'MaxCoolant', 'CoolerUnitRateLimit', 'CoolerUnitRate',
-        'SocketUnitRateLimit', 'SocketUnitRate'],
+                  'FuelChamberUnitRateLimit', 'FuelChamberUnitRate',
+                  'GeneratorUnitRateLimit', 'GeneratorUnitRate', 'StoredCoolant',
+                  'MaxCoolant', 'CoolerUnitRateLimit', 'CoolerUnitRate',
+                  'SocketUnitRateLimit', 'SocketUnitRate'],
     "Button": ['ButtonState', 'ButtonOnStateValue', 'ButtonOffStateValue',
-        'ButtonStyle'],
+               'ButtonStyle'],
     "Chip": ['ChipWait'],
     "Lamp": ['LampOn', 'LampLumens', 'LampColorHue', 'LampColorSaturation',
-        'LampColorValue', 'LampRange']
+             'LampColorValue', 'LampRange']
 }
-
 
 # Unit test
 if __name__ == "__main__":

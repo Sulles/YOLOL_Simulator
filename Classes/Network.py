@@ -8,7 +8,8 @@ Author: StolenLight
 This class hosts all the objects within a network
 """
 
-from map import *
+from .map import *
+
 
 class Network():
     def __init__(self, name, obj_settings):
