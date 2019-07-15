@@ -11,7 +11,7 @@ This class hosts all the objects within a network
 from .map import *
 
 
-class Network():
+class Network:
     def __init__(self, name, obj_settings):
         """
         :param name: name of the network
@@ -26,13 +26,13 @@ class Network():
         for obj in obj_settings.keys():
             self.objects.append(obj_map[obj](obj_settings[obj]))
 
-    def _print(self):
+    def print(self):
         print("=== NETWORK INFORMATION ===\n"
               "Name: {0}\n"
               "Objects: {1}".format(self.name, [obj.name for obj in self.objects]))
 
         for obj in self.objects:
-            obj._print()
+            obj.print()
 
 
 # Unit test
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     print("Running unit test for Network class...")
     Net = Network("Button_Light", {"Button": {'name': 'butt_name', "state": 2},
                                    "Lamp": {'name': 'lamp_name', "on": True}})
-    Net._print()
+    Net.print()

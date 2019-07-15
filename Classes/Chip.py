@@ -19,19 +19,19 @@ import os
 
 
 # This is the sub-class
-class _chip():
+class _chip:
     def __init__(self, yolol_code, wait=0):
         self.name = yolol_code
-        self.ChipWait = wait
+        self.chipwait = wait
         self.create_yolol_code(yolol_code)
 
     def _print(self):
         print("=== CHIP INFORMATION ===")
         print("Chip Name: {0}\n"
-              "Chip Wait: {1}".format(self.name, self.ChipWait))
+              "Chip Wait: {1}".format(self.name, self.chipwait))
 
     def create_yolol_code(self, yolol_code):
-        # TODO: Add assert for file existance
+        # TODO: Add assert for file existence
         self.parse_yolol(yolol_code)
 
     def parse_yolol(self, yolol_code):
@@ -39,24 +39,27 @@ class _chip():
             yolol = open(os.path.join("../YOLOLCode/{}.txt".format(yolol_code)), "r")
             # for line in yolol:
 
+            yolol.close()
+
         except Exception as e:
             print("Could not open {0} because:\n{1}".format(
                 yolol_code, e))
             raise e
 
-        finally:
-            yolol.close()
-
 
 # This is the main chip class
-# TODO: Add chip-specific functionality and verify code compatability for each chip type
+# TODO: Add chip-specific functionality and verify code compatibility for each chip type
 class Chip(_chip):
     def __init__(self, yolol_code=""):
         assert isinstance(yolol_code, str), "Invalid YOLOL Code name"
         _chip.__init__(self, yolol_code)
 
+    def print(self):
+        self._print()
+
 
 # Unit test
 if __name__ == "__main__":
     print("Running unit test for Chip class...")
-    chip1 = Chip("chip_1")
+    chip = Chip("")
+    chip.print()

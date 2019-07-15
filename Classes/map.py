@@ -24,18 +24,18 @@ obj_map = {
 }
 
 func_map = {
-    "CargoBeam": ['CargoBeamOnState', 'CargoBeamSearchLength'],
-    "FixedMount": ['CurrentState', 'OnState', 'OffState', 'ButtonStyle'],
-    "Generator": ['FuelChamberFuel', 'FuelChamberMaxFuel',
-                  'FuelChamberUnitRateLimit', 'FuelChamberUnitRate',
-                  'GeneratorUnitRateLimit', 'GeneratorUnitRate', 'StoredCoolant',
-                  'MaxCoolant', 'CoolerUnitRateLimit', 'CoolerUnitRate',
-                  'SocketUnitRateLimit', 'SocketUnitRate'],
-    "Button": ['ButtonState', 'ButtonOnStateValue', 'ButtonOffStateValue',
-               'ButtonStyle'],
-    "Chip": ['ChipWait'],
-    "Lamp": ['LampOn', 'LampLumens', 'LampColorHue', 'LampColorSaturation',
-             'LampColorValue', 'LampRange']
+    "CargoBeam": ['cargobeamonstate', 'cargobeamsearchlength'],
+    "FixedMount": ['currentstate', 'onstate', 'offstate', 'buttonstyle'],
+    "Generator": ['fuelchamberfuel', 'fuelchambermaxfuel',
+                  'fuelchamberunitratelimit', 'fuelchamberunitrate',
+                  'generatorunitratelimit', 'generatorunitrate', 'storedcoolant',
+                  'maxcoolant', 'coolerunitratelimit', 'coolerunitrate',
+                  'socketunitratelimit', 'socketunitrate'],
+    "Button": ['buttonstate', 'buttononstatevalue', 'buttonoffstatevalue',
+               'buttonstyle'],
+    "Chip": ['chipwait'],
+    "Lamp": ['lampon', 'lamplumens', 'lampcolorhue', 'lampcolorsaturation',
+             'lampcolorvalue', 'lamprange']
 }
 
 # Unit test

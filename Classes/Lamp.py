@@ -9,7 +9,7 @@ This class simulates the funtionality of a Lamp in Starbase.
 """
 
 
-class Lamp():
+class Lamp:
     def __init__(self, input_settings):
         """
         :param input_settings: dictionary of settings.
@@ -24,32 +24,32 @@ class Lamp():
                 settings[set] = input_settings[set]
 
         self.name = settings['name']
-        self.LampOn = settings['on']
+        self.lampon = settings['on']
         self.lumens_list = [0, settings['lumens']]
         self.hue_list = [0, settings['hue']]
         self.saturation_list = [0, ['saturation']]
         self.value_list = [0, settings['value']]
         self.range_list = [0, settings['range']]
 
-        self.LampLumens = self.LampColorHue = self.LampColorSaturation = \
-            self.LampColorValue = self.LampRange = None
+        self.lamplumens = self.lampcolorhue = self.lampcolorsaturation = \
+            self.lampcolorvalue = self.lamprange = None
         self.enable_disable()
 
     def toggle_on_off(self):
-        if self.LampOn:
-            self.LampOn = False
+        if self.lampon:
+            self.lampon = False
         else:
-            self.LampOn = True
+            self.lampon = True
         self.enable_disable()
 
     def enable_disable(self):
-        self.LampLumens = self.lumens_list[self.LampOn]
-        self.LampColorHue = self.hue_list[self.LampOn]
-        self.LampColorSaturation = self.saturation_list[self.LampOn]
-        self.LampColorValue = self.value_list[self.LampOn]
-        self.LampRange = self.range_list[self.LampOn]
+        self.lamplumens = self.lumens_list[self.lampon]
+        self.lampcolorhue = self.hue_list[self.lampon]
+        self.lampcolorsaturation = self.saturation_list[self.lampon]
+        self.lampcolorvalue = self.value_list[self.lampon]
+        self.lamprange = self.range_list[self.lampon]
 
-    def _print(self):
+    def print(self):
         print("=== LAMP INFORMATION ===\n"
               "Name: {0}\n"
               "Is ON: {1}\n"
@@ -58,13 +58,13 @@ class Lamp():
               "Current Saturation: {4}\n"
               "Current Value: {5}\n"
               "Current Range: {6}".format(
-            self.name, self.LampOn, self.LampLumens, self.LampColorHue,
-            self.LampColorSaturation, self.LampColorValue, self.LampRange))
+                self.name, self.lampon, self.lamplumens, self.lampcolorhue,
+                self.lampcolorsaturation, self.lampcolorvalue, self.lamprange))
 
 
 # Unit test
 if __name__ == "__main__":
-    lamp = Lamp(on=True)
-    lamp._print()
+    lamp = Lamp({"on": True, "lumens": 500, "hue": 150, "saturation": 0.8, "value": 0.2, "range": 8})
+    lamp.print()
     lamp.toggle_on_off()
-    lamp._print()
+    lamp.print()
