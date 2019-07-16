@@ -20,12 +20,15 @@ def __main__(file_name):
             line = line.lower()
 
             assert len(line) <= 70, \
-                'ERROR: Each line can only contain 70 characters! This line had {0}'.format(len(line))
+                "ERROR: Each line can only contain 70 characters! Your line '{0}' has {1} characters".format(
+                    line, len(line))
 
             print("Parsing line: {}".format(line))
 
             if handle_conditional(line, py_file):
                 print("Conditionals parsed")
+            elif handle_set_value(line, py_file):
+                print("Values set")
 
         yolol_file.close()
         py_file.close()
@@ -33,6 +36,32 @@ def __main__(file_name):
     except Exception as e:
         print("Something went wrong!\n{}".format(e))
         raise e
+
+
+def handle_set_value(line, output_file):
+    """
+
+    :param line:
+    :param output_file:
+    :return:
+    """
+    verif = re.search('(={1}|\+=|-=|\+\+|--|\*=|/=|%=)', line)
+    try:
+        print("Found set value {0} in '{1}'".format(verif.group(0), line))
+    # Raises AttributeError if no match
+    except AttributeError:
+        return False
+
+    matches = re.findall('([a-z]+\s?)([^a-zA-Z0-9"\s]+)\s?("[^"]+"|\S+)\s?#?', line)
+
+    print("Matches! '{}'".format(matches))
+
+    for x in range(0, len(matches)):
+        output_file.write("\n" + str(matches[x][0] + " " + matches[x][1]) + " " + matches[x][2])
+
+    # Write stuff to output file!
+
+    return True
 
 
 def handle_conditional(line, output_file):
@@ -43,22 +72,29 @@ def handle_conditional(line, output_file):
     :return: Boolean to indicate whether conditionals were found and parsed
     """
 
-    verif = re.search('.*(if|then|else|end).*', line)
+    verif = re.search('if|then|else|end', line)
     try:
-        print("Found {0} conditionals in '{1}'".format(len(verif.group(1)), verif.group()))
+        print("Found conditional {0} in '{1}'".format(verif.group(0), line))
     # Raises AttributeError if no match
     except AttributeError:
         return False
 
-    assert line[0:2] == 'if', "ERROR: Conditionals must start with 'if'! Your line was: '{}'".format(line)
+    assert line[0:2] == 'if', "ERROR: Conditionals must start with 'if'! Your line was: {}".format(line)
 
     map_cond_state_expr = get_cond_state_expr(line)
+    # map_cond_state_expr = re.findall(
+    #     'if\s+([a-z]+|:[a-z]+)\s*([^a-z0-9"\s]+)\s*(\S)\s+then\s+([a-z]+|:[a-z]+)\s*([^a-z0-9"\s]+)\s*(\S)\s+([a-z]+\s?#?)',
+    #     line)
     last_part = re.search('end (.*)', line)
     print("Parsed YOLOL conditional statement: {}".format(map_cond_state_expr))
     try:
-        print("Found something after end: {}".format(last_part.group(1)))
+        last_part = last_part.group(1)
+        print("Found something after end: {}".format(last_part))
+    # Raises AttributeError if no match found
     except AttributeError:
-        pass
+        last_part = None
+
+    # Write stuff to output file!
 
     return True
 
@@ -75,7 +111,7 @@ def get_cond_state_expr(line, map=[]):
     # group 3: (\W+) = captures conditional expressions, i.e. '=' or '~='
     # group 4: (\S*) = captures comparative value, i.e. '2' or '"some_string"'
     # group 5: (.*end.*) = captures everything else
-    matches = re.search('([a-z]+) ([a-z]+|:[a-z]+)\s*(\W+)\s*(\S*) (.*end.*)', line)
+    matches = re.search('([a-z]+) ([a-z]+|:[a-z]+)\s*(\W+)\s*(\S*) (.*end.*)\s?#?', line)
     # print("Found conditional statement '{0}'\n"
     #       "Found variable or function '{1}'\n"
     #       "Found conditional expression '{2}'\n"
@@ -93,4 +129,4 @@ def get_cond_state_expr(line, map=[]):
 
 # Unit test
 if __name__ == "__main__":
-    __main__("button_lamp")
+    __main__("")
