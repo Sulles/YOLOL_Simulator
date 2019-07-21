@@ -20,4 +20,5 @@ YOLOL is the in-game programming language for Starbase https://www.frozenbyte.co
 
 ## Other Links:
 For general information about YOLOL and AST: https://github.com/Jerald/yolol-is-cylons
+
 Starbase wiki link for YOLOL: https://wiki.starbasegame.com/index.php/YOLOL
