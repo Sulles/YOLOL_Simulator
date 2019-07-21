@@ -9,6 +9,8 @@ Pygame Simulator Framework (5%)
 
 Python Emulator Object Classes and Network (10%)
 
+## Want to Contribute?
+This is an open source project and all contributions are welcome! Feel free to join the discord channel dedicated to CYLONS https://discord.gg/rmu6aCr and PM me (username=StolenLight) and I would be more than happy to discuss how you would like to help!
 
 ## Known Issues
 
