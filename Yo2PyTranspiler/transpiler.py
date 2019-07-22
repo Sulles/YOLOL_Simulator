@@ -9,15 +9,16 @@ This script transpiles YOLOL code to Python
 """
 
 import re
+
 re_dict = {'statement': '((:?[a-z]+[a-z0-9]*)\s?([\+?\-\*\/\%=]{1,2})\s?([:?a-z0-9\+\-\*\/\%]+|"[^"]+"))',
-           'expression_if': '(if (:?[a-z0-9]+)\s?(==|~=|>=?|<=?)\s?(:?[a-z0-9]*|".*") then (.*) end\b)',
-           'expression_then': ''}
+           'expression': '(if (:?[a-z0-9]+)\s?(==|~=|>=?|<=?)\s?(:?[a-z0-9]*|".*") (then (.*) else (if .* then .*)|then (.*) else|then)(.*)end)'
+           }
 
 
 def __main__(file_name):
     try:
         yolol_file = open("../YOLOLCode/{}.txt".format(file_name), 'r')
-        py_file = open("../PythonizedYOLOLCode/{}.py".format(file_name), 'w')
+        py_file = open("../PythonizedYOLOLCode/{}.py".format(file_name), 'w+')
 
         line_counter = 0
 
@@ -37,8 +38,10 @@ def __main__(file_name):
             try:
                 parse_line(line.replace('\n', ''), py_file)
             except Exception as e:
-                print("CRITICAL ERROR: %s" %e)
+                print("CRITICAL ERROR: %s" % e)
                 raise e
+
+        handle_indents(py_file)
 
         yolol_file.close()
         py_file.close()
@@ -58,7 +61,7 @@ def parse_line(line, py_file, return_leftovers=False):
     This function handles parsing every line
     :param line: string of lower case characters to interpret
     :param py_file: pythonized file to write transpilation to
-    :param ret: return boolean, if want to return leftovers rather than re-parse
+    :param return_leftovers: return boolean, if want to return leftovers rather than re-parse
     :return leftovers: if there is extra stuff at the end of an interpretation,
         return the leftovers, what could not be interpreted
     """
@@ -69,16 +72,19 @@ def parse_line(line, py_file, return_leftovers=False):
     if re.findall('(\s*)', line)[0] == line:
         print("Only white space found, skipping...")
         return
+    else:
+        while line[0] == " ":
+            line = line[1:]
 
     if is_comment(line):
         py_file.write('\n# COMMENT: ' + line[2:])
         print("Comment handled")
     elif is_statement(line):
         leftovers = handle_statement(line, py_file)
-        print("Conditional parsed")
+        print("Statement parsed")
     elif is_expression(line):
         leftovers = handle_expression(line, py_file)
-        print("Values set")
+        print("Expression parsed")
     else:
         print("What even is this? '%s'" % line)
         raise AssertionError
@@ -100,7 +106,7 @@ def is_comment(line):
 
 def is_expression(line):
     # All expressions must start with 'if' and have 'then' and 'end'
-    if re.match('if .* then .* end', line):
+    if re.match(re_dict['expression'], line):
         return True
     else:
         return False
@@ -119,18 +125,37 @@ def handle_expression(line, output_file):
     :param line: string of lower case characters to interpret
     :param output_file: pythonized file to write transpilation to
     """
-    print("Got line: '{}'".format(line))
-    match = re.findall(re_dict['expression_if'], line)
+    match = re.findall(re_dict['expression'], line)
     print("Match: '{}'".format(match))
-    if match != []:
-        print("Found match: '{}'".format(match))
-    else:
-        print("???")
-    # else:
-    #     match = re.findall(re_dict['expression_then'], line)
-    #     if match == []:
-    #         raise (AttributeError, "Ummmm, what is this? {}".format(line))
-    #     print("Found match: '{}'".format(match))
+
+    assert match is not None, "ERROR: Could not find an expression in: '{}'\nRegex used: '{}'".format(
+        line, re_dict['expression'])
+
+    m = [_ for _ in match[0]]
+
+    # Exception handling
+    if m[2] == '~=':
+        m[2] = '!='
+
+    if m[6] == 'else if':
+        m[6] = 'elif '
+
+    output = str("\nif " + m[1] + " " + m[2] + " " + m[3] + ": #(start_indent)")
+    output_file.write(output)
+
+    for x in range(5, 9):
+        if re.findall('(\s*)', m[x])[0] != m[x]:
+            parse_line(m[x], output_file)
+        else:
+            print("Skipped line, only white spaces left...")
+
+    # parse rest of expression...
+    parse_line(m[7], output_file)
+    output_file.write('#(last_indent)')
+
+    # parse rest of line...
+    end_index = line.index(m[0]) + len(m[0])
+    parse_line(line[end_index:], output_file)
 
 
 def handle_statement(line, output_file):
@@ -206,6 +231,30 @@ def handle_statement_exceptions(line, output_file):
         return None
 
 
+def handle_indents(output_file):
+    """
+    This function auto-indents lines based on matching (start_indent) and (last_indent)
+    :param output_file:
+    :return:
+    """
+    copy = ""
+    indent = "    "
+    num_of_indents = 0
+    output_file.seek(0, 0)
+    for line in output_file:
+        # print("Num of indents: {}".format(num_of_indents))
+        copy += str(indent * num_of_indents + line)
+        for _ in range(len(re.findall('#\(last_indent\)', line))):
+            # print("found end indent")
+            num_of_indents -= 1
+        for _ in range(len(re.findall('#\(start_indent\)', line))):
+            # print("found start indent")
+            num_of_indents += 1
+
+    output_file.seek(0, 0)
+    output_file.write(copy)
+
+
 def send_match_to_output(match, output_file):
     print("Sending match to output file: '{}'".format(match))
     output = "\n"
@@ -213,7 +262,6 @@ def send_match_to_output(match, output_file):
         output += m + " "
 
     output_file.write(output)
-
 
 
 # Unit test

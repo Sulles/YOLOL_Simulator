@@ -3,7 +3,7 @@ This project strives to simulate the interaction between YOLOL code and all obje
 
 ## Current Progress
 
-YOLOL Transpiler (65%)
+YOLOL Transpiler (75%)
 
 Pygame Simulator Framework (5%)
 

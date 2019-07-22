@@ -19,6 +19,16 @@ i = "hello"
 # COMMENT:  conditionals
 
 # Line 4
-# COMMENT: if var==0 then endres=1 else if var==1 then endres=2 end end
+if var == 0: #(start_indent)
+    endres = 1 
+    if var == 1: #(start_indent)
+        endres = 2 #(last_indent)#(last_indent)
 
 # Line 5
+if var == 0: #(start_indent)
+    if endres != 1: #(start_indent)
+        endres = 2 #(last_indent)
+    endres = 1 
+    if endres != 1: #(start_indent)
+        endres = 2 #(last_indent)#(last_indent)
+a = :b 
