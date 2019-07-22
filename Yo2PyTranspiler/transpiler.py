@@ -11,7 +11,7 @@ This script transpiles YOLOL code to Python
 import re
 
 re_dict = {'statement': '((:?[a-z]+[a-z0-9]*)\s?([\+?\-\*\/\%=]{1,2})\s?([:?a-z0-9\+\-\*\/\%]+|"[^"]+"))',
-           'expression': '(if (:?[a-z0-9]+)\s?(==|~=|>=?|<=?)\s?(:?[a-z0-9]*|".*") (then (.*) else (if .* then .*)|then (.*) else|then)(.*)end)'
+           'expression': '((else if|if) (:?[a-z0-9]+)\s?(==|~=|>=?|<=?)\s?(:?[a-z0-9]*|".*") (then (.*) (else if .* then .*)|then (.*) else|then)(.*)end)'
            }
 
 
@@ -134,23 +134,26 @@ def handle_expression(line, output_file):
     m = [_ for _ in match[0]]
 
     # Exception handling
-    if m[2] == '~=':
-        m[2] = '!='
+    if m[1] == "else if":
+        # Drop an indent
+        output_file.write("\n#(last_indent)")
+        m[1] = "elif"
+    else:
+        m[1] = "if"
+    if m[3] == '~=':
+        m[3] = '!='
 
-    if m[6] == 'else if':
-        m[6] = 'elif '
-
-    output = str("\nif " + m[1] + " " + m[2] + " " + m[3] + ": #(start_indent)")
+    output = str("\n" + m[1] + " " + m[2] + " " + m[3] + " " + m[4] + ": #(start_indent)")
     output_file.write(output)
 
-    for x in range(5, 9):
+    for x in range(6, 9):
         if re.findall('(\s*)', m[x])[0] != m[x]:
             parse_line(m[x], output_file)
         else:
             print("Skipped line, only white spaces left...")
 
     # parse rest of expression...
-    parse_line(m[7], output_file)
+    parse_line(m[9], output_file)
     output_file.write('#(last_indent)')
 
     # parse rest of line...
@@ -246,7 +249,8 @@ def handle_indents(output_file):
         copy += str(indent * num_of_indents + line)
         for _ in range(len(re.findall('#\(last_indent\)', line))):
             # print("found end indent")
-            num_of_indents -= 1
+            if num_of_indents > 0:
+                num_of_indents -= 1
         for _ in range(len(re.findall('#\(start_indent\)', line))):
             # print("found start indent")
             num_of_indents += 1
