@@ -1,5 +1,0 @@
-// Variable setting
-a=1 :b+=2 c-=3 d*=4 e/=5 :f ++ -- g h%=2 i = "hello" :j= "world"
-// Conditionals
-if var==0 then endRes=1 else if var==1 then endRes=2 end end
-if var==0 then if endRes~=1 then endRes=2 end else endRes=1 end A =:b
