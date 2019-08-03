@@ -1,1 +1,0 @@
-if :ButtonState=1 then :LampOn=1 end hello

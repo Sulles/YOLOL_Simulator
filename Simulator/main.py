@@ -15,7 +15,7 @@ from pygame.locals import *
 # from time import time
 
 # noinspection PyUnresolvedReferences
-from src.constants import *
+from src.constants import colors
 
 # import os
 # from pprint import pprint

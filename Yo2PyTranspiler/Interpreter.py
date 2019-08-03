@@ -13,11 +13,11 @@ def __main__():
     Mai
     n function, opens files and creates python translation
     """
-    cAST = open('CAST.txt', 'r')
-    global C_Py
-    C_Py = open('CPy.py', 'w+')
+    CylonAST = open('CylonAST.txt', 'r')
+    global YoPy
+    YoPy = open('YoPy.py', 'w+')
 
-    json_struct = json.loads(cAST.read())
+    json_struct = json.loads(CylonAST.read())
     # print(json.dumps(json_struct, indent=2, sort_keys=True))
 
     for line in json_struct['program']['lines']:
@@ -26,8 +26,8 @@ def __main__():
     handle_indents()
     handle_globals()
 
-    cAST.close()
-    C_Py.close()
+    CylonAST.close()
+    YoPy.close()
 
 
 def handle_globals():
@@ -35,8 +35,8 @@ def handle_globals():
     This function handles the preceding ':' for external variables
     """
     output = ""
-    C_Py.seek(0, 0)
-    for line in C_Py.readlines():
+    YoPy.seek(0, 0)
+    for line in YoPy.readlines():
         matches = re.findall(r'(:[a-z0-9]+)', line)
         if matches:
             for m in matches:
@@ -45,8 +45,8 @@ def handle_globals():
         output += line
 
     # print(output)
-    C_Py.seek(0, 0)
-    C_Py.write(output)
+    YoPy.seek(0, 0)
+    YoPy.write(output)
 
 
 def handle_indents():
@@ -54,10 +54,10 @@ def handle_indents():
     This function handles indents for Python
     """
     output = ""
-    C_Py.seek(0, 0)
+    YoPy.seek(0, 0)
     tab_counter = 0
     tab = '    '
-    for line in C_Py.readlines():
+    for line in YoPy.readlines():
         new_line = tab_counter * tab + line
         output += new_line
         # print(new_line)
@@ -71,27 +71,27 @@ def handle_indents():
             tab_counter -= 1 * len(end)
 
     # print(output)
-    C_Py.seek(0, 0)
-    C_Py.write(output)
+    YoPy.seek(0, 0)
+    YoPy.write(output)
 
 
 def parse(line):
     """
-    This function parses a dictionary, aka JSON structure, and passes the python equivalent to global CPy.py file
+    This function parses a dictionary, aka JSON structure, and passes the python equivalent to global YoPy.py file
     :param line: JSON structure of the line to parse
     :return: N/A
     """
-    C_Py.write('\n# NEW LINE!\n')
+    YoPy.write('\n# NEW LINE!\n')
     # print('NEW LINE!')
     if len(line['comment']) > 0:
-        C_Py.write('\n# {}'.format(line['comment']))
+        YoPy.write('\n# {}'.format(line['comment']))
         print('Wrote comment: %s' % line['comment'])
     if len(line['code']) > 0:
         for code_bit in line['code']:
             if code_bit['type'] == 'statement::assignment' or code_bit['type'] == 'statement::expression':
-                C_Py.write('\n' + handle_assignment(code_bit))
+                YoPy.write('\n' + handle_assignment(code_bit))
             elif code_bit['type'] == 'statement::if':
-                C_Py.write('\n' + handle_if(code_bit))
+                YoPy.write('\n' + handle_if(code_bit))
             else:
                 print('Got code bit: "%s"' % code_bit)
     return
