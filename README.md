@@ -1,13 +1,12 @@
 # YOLOL Simulator
 This project strives to simulate the interaction between YOLOL code and all objects within its network
 
-## Current Progress
--
+# Current Progress #
 
-## Using CYLON AST v0.3.0
+## CYLON AST v0.3.0
 - YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
 - Current use of this program requires using Discord bot to get CYLON AST, would be nice to have a back-end
-## AST To Python Converter v0.1 (100%)
+## CYLON AST To Python Converter v0.1 (100%)
 - Needs debugging
 
 ## Pygame Simulator Framework (5%)
