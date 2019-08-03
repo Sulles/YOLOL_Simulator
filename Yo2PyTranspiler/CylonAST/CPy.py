@@ -1,11 +1,11 @@
 
 # NEW LINE!
 
-if var == 0: 	# START IF:
-if endres != 1: 	# START IF:
-endres = 2
-else:
- 	# END IF
-else:
-endres = 1 	# END IF
-a = :b
+#  if elif end (end)
+if var == 0: 	# START INDENT
+    endres = 1 	# END INDENT
+
+else: 	# START INDENT
+    if var == 1: 	# START INDENT
+        endres = 2 	# END INDENT
+    # END INDENT 	# END INDENT

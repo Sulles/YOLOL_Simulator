@@ -2,14 +2,22 @@
 This project strives to simulate the interaction between YOLOL code and all objects within its network
 
 ## Current Progress
+-
 
-Using CYLON AST v0.3.0
-YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
-AST To Python Converter v0.0.0 (0%)
+## Using CYLON AST v0.3.0
+- YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
+- Current use of this program requires using Discord bot to get CYLON AST, would be nice to have a back-end
+## AST To Python Converter v0.1 (100%)
+- Needs debugging
 
-Pygame Simulator Framework (5%)
+## Pygame Simulator Framework (5%)
 
-Python Emulator Object Classes and Network (10%)
+## Python Emulator Object Classes and Network (5%)
+Currently supported devices:
+- YOLOL Chip
+- Button
+- Lamp
+
 
 ## Want to Contribute?
 This is an open source project and all contributions are welcome! Feel free to join the discord channel dedicated to CYLONS https://discord.gg/rmu6aCr and PM me (username=StolenLight) and I would be more than happy to discuss how you would like to help!
