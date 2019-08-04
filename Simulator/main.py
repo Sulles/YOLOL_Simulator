@@ -1,6 +1,6 @@
 """
 Created: July 14, 2019
-Last Updated:
+Last Updated: August 3, 2019
 
 Author: StolenLight
 
@@ -8,28 +8,44 @@ Author: StolenLight
 This is the main simulator code. From here, users can
 """
 
-
 import pygame
 import sys
+import os
 from pygame.locals import *
 # from time import time
+# from pprint import pprint
 
 # noinspection PyUnresolvedReferences
 from src.constants import colors
-
-# import os
-# from pprint import pprint
+# noinspection PyUnresolvedReferences
+from src.GUI import GUI
+# noinspection PyUnresolvedReferences
+from Classes.Network import Network
 
 
 def simulator():
     pygame.init()
-    surface = pygame.display.set_mode((800, 500))
+    global DISPLAY
+    DISPLAY = dict(width=800, height=500)
     FPS_CLOCK = pygame.time.Clock()
     FPS = 60
     # START_TIME = time()
+
+    surface = pygame.display.set_mode((DISPLAY['width'], DISPLAY['height']))
     pygame.display.set_caption('Proving Ground')
+    gui = GUI(DISPLAY)
 
     # Initialize Network here
+    network_settings = {'Button':
+                            {'name': 'butt_name',
+                             'state': 0,
+                             'position': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
+                             'color_map': [colors['RED'], colors['GREEN']]},
+                        'Lamp':
+                            {'name': 'lamp_name',
+                             'state': 1,
+                             'position': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]}}
+    network = Network('test_network', network_settings)
 
     print("Initialization complete, running playground...")
 
@@ -55,10 +71,10 @@ def simulator():
 
             elif event.type == MOUSEBUTTONDOWN:
                 # pprint(vars(event))
-                if event.button == 3:       # right click
+                if event.button == 3:  # right click
                     print("Right click found!")
                     # engine.add_body(event.pos, (0, 0), (0, 0), 0, 1, randint(10, 50))
-                elif event.button == 1:     # left click
+                elif event.button == 1:  # left click
                     print("Left click found!")
                     # if not selected_eid and engine.bm.len() > 0:
                     #     selected_eid = \
@@ -70,7 +86,12 @@ def simulator():
 
         surface.fill(colors['BGCOLOR'])
 
-        # Draw everything here
+        # Drawing objects
+        for obj in network.get_objects():
+            pygame.draw.rect(surface, obj.color, obj.rect)
+
+        # Drawing GUI
+        gui.draw(surface)
 
         # Perform tick update here
 

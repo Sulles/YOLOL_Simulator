@@ -1,6 +1,6 @@
 """
 Created: July 13, 2019
-Last Updated:
+Last Updated: August 3, 2019
 
 Author: StolenLight
 
@@ -33,6 +33,9 @@ class Network:
 
         for obj in self.objects:
             obj.print()
+
+    def get_objects(self):
+        return [_ for _ in self.objects]
 
 
 # Unit test
