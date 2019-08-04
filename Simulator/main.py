@@ -39,19 +39,20 @@ def simulator():
     network_settings = {'Button0':
                             {'name': 'butt_name',
                              'state': 0,
-                             'position': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
+                             'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
                              'color_map': [colors['RED'], colors['GREEN']]},
                         'Lamp':
                             {'name': 'lamp_name',
                              'state': 1,
-                             'position': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]}}
+                             'center': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]}}
     network = Network('test_network', network_settings)
 
     print("Initialization complete, running playground...")
 
+    selected_obj = None
+
     # MAIN LOOP
     while True:
-
         for event in pygame.event.get():
             # EXIT CONDITION
             if event.type == QUIT:
@@ -71,12 +72,23 @@ def simulator():
 
             elif event.type == MOUSEBUTTONDOWN:
                 # pprint(vars(event))
-                if event.button == 3:  # right click
+                if event.button == 3:   # right click
                     print('Right click found: {}'.format(event.pos))
-                    # engine.add_body(event.pos, (0, 0), (0, 0), 0, 1, randint(10, 50))
-                elif event.button == 1:  # left click
+                    selected_obj = network.get_closest_obj(event.pos)
+                    print('Got closest obj with name: "%s"' % selected_obj.name)
+                elif event.button == 1: # left click
                     print('Left click found: {}'.format(event.pos))
                     network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
+
+            elif event.type == MOUSEBUTTONUP:
+                if event.button == 3:   # right click
+                    print('Right mouse up found?')
+                    selected_obj = None
+                if event.button == 1:   # left click
+                    network.handle_action(event.pos, action_type='LEFT_MOUSE_UP')
+
+        if selected_obj:
+            selected_obj.set_center(pygame.mouse.get_pos())
 
         surface.fill(colors['BGCOLOR'])
 

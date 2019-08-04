@@ -9,6 +9,7 @@ This class hosts all the objects within a network
 """
 
 from .map import *
+from math import sqrt
 
 
 class Network:
@@ -49,6 +50,19 @@ class Network:
                     action_location[1] in range(obj.hit_box[1][0], obj.hit_box[1][1]):
                 obj.handle_action(action_type)
 
+    def get_closest_obj(self, action_location):
+        distance = []
+        obj_index = []
+        for obj in self.objects:
+            print('Got obj: "%s" with center: "%s"' % (obj.name, obj.center))
+            distance.append(self.distance(obj.center, action_location))
+            obj_index.append(self.objects.index(obj))
+        return self.objects[obj_index[distance.index(min(distance))]]
+
+    @staticmethod
+    def distance(a, b):
+        return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+
     def draw(self, surface):
         """
         This function is called to handle drawing all devices
@@ -59,11 +73,3 @@ class Network:
 
     def get_objects(self):
         return [_ for _ in self.objects]
-
-
-# Unit test
-if __name__ == "__main__":
-    print("Running unit test for Network class...")
-    Net = Network("Button_Light", {"Button": {'name': 'butt_name', "state": 2},
-                                   "Lamp": {'name': 'lamp_name', "on": True}})
-    Net.print()

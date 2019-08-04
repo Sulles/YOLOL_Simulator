@@ -13,28 +13,29 @@ from pygame import draw as pygame_draw
 
 
 class PygameObj:
-    def __init__(self, position, width, height, color_map, shapes):
+    def __init__(self, center, width, height, color_map, shapes):
         """
         The initializer for the main Pygame object
-        :param position: list of length two: is the top left position of the object, using pixel coordinates
+        :param center: list of length two: is the center of the object, using pixel coordinates
         :param width: int
         :param height: int
         :param color_map: list
         :param shapes: list of dictionaries of dictionaries, i.e.
-            shapes = [{'type': 'rect', 'color': colors['WHITE'], 'settings': {'position': [0, 0], 'width': 10, 'height': 10}},
-                      {'type': 'circle', 'color': None, 'settings: {'position': [20, 20], 'radius': 5}}]
+            shapes = [{'type': 'rect', 'color': colors['WHITE'], 'settings': {'center': [0, 0], 'width': 10, 'height': 10}},
+                      {'type': 'circle', 'color': None, 'settings: {'center': [20, 20], 'radius': 5}}]
         """
         if isinstance(color_map, tuple):
             color_map = [color_map]
 
-        # Drawing parameters
-        self.position = [int(position[0]), int(position[1])]
+        # Object parameters
+        self.center = [int(center[0] - width / 2), int(center[1] - height / 2)]
         self.width = int(width)
         self.height = int(height)
-        self.hit_box = [[self.position[0], self.position[0] + self.width],
-                        [self.position[1], self.position[1] + self.height]]
+        self.hit_box = None
+        self.update_hit_box()
         self.color_map = color_map
         self.color = color_map[0]
+        self.shape_def = shapes
 
         self.drawable_shapes = []
         for shape_def in shapes:
@@ -45,18 +46,28 @@ class PygameObj:
             if 'border' not in shape_def or shape_def['border'] is None:
                 shape_def['border'] = 0
 
-            if shape_def['type'].lower() == 'rect':
+        self.update_shapes()
+
+    def update_shapes(self):
+        # clear all shapes
+        self.drawable_shapes = []
+
+        # re-create shapes
+        for shape in self.shape_def:
+            if shape['type'].lower() == 'rect':
                 self.drawable_shapes.append(
-                    dict(type='rect', color=shape_def['color'], rect=self.create_rect(shape_def['settings']),
-                         width=shape_def['width']))
-            elif shape_def['type'].lower() == 'circle':
+                    dict(type='rect', color=shape['color'], rect=self.create_rect(shape['settings']),
+                         width=shape['width']))
+            elif shape['type'].lower() == 'circle':
+                center = [self.center[0] + int(shape['settings']['center'][0] / 2),
+                          self.center[1] + int(shape['settings']['center'][1] / 2)]
                 self.drawable_shapes.append(
-                    dict(type='circle', color=shape_def['color'], radius=int(shape_def['settings']['radius']),
-                         position=[int(_) for _ in shape_def['settings']['position']], width=shape_def['width']))
+                    dict(type='circle', color=shape['color'], radius=int(shape['settings']['radius']),
+                         center=center, width=shape['width']))
 
     def _update_color(self, map_index):
         self.color = self.color_map[map_index]
-        print('Current color: {}'.format(self.color))
+        # print('Current color: {}'.format(self.color))
 
     def _draw(self, surface):
         for shape in self.drawable_shapes:
@@ -69,20 +80,30 @@ class PygameObj:
             if shape['type'] == 'rect':
                 pygame_draw.rect(surface, color, shape['rect'], shape['width'])
             elif shape['type'] == 'circle':
-                pygame_draw.circle(surface, color, shape['position'], shape['radius'], shape['width'])
+                pygame_draw.circle(surface, color, shape['center'], shape['radius'], shape['width'])
 
-    @staticmethod
-    def create_rect(rect_settings):
+    def set_center(self, new_center):
+        self.center = [new_center[0], new_center[1]]
+        self.update_shapes()
+        self.update_hit_box()
+
+    def update_hit_box(self):
+        self.hit_box = [[self.center[0] - int(self.width / 2), self.center[0] + int(self.width / 2)],
+                        [self.center[1] - int(self.height / 2), self.center[1] + int(self.height / 2)]]
+
+    def create_rect(self, rect_settings):
         """
         This function creates the pygame.Rect object for a rectangle
         :param rect_settings: dictionary
             Required fields:
-                - position
+                - center
                 - width
                 - height
             Optional fields:
                 - border
         :return: returns dictionary (rect=pygame.Rect object, width=border width)
         """
-        return pygame_rect(rect_settings['position'][0], rect_settings['position'][1],
+        top_left = [self.center[0] + rect_settings['center'][0] - int(rect_settings['width'] / 2),
+                    self.center[1] + rect_settings['center'][1] - int(rect_settings['height'] / 2)]
+        return pygame_rect(top_left[0], top_left[1],
                            rect_settings['width'], rect_settings['height'])

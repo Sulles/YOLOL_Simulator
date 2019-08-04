@@ -1,6 +1,6 @@
 """
 Created: July 13, 2019
-Last Updated:
+Last Updated: August 3, 2019
 
 Author: StolenLight
 
@@ -13,9 +13,9 @@ For Example: YOLOL code has line...
 This function knows that a Button object is expected
 """
 
-from .Button import *
-from .Chip import *
-from .Lamp import *
+from .Button import Button, Button0
+from .Chip import Chip
+from .Lamp import Lamp
 
 obj_map = {
     'Button': Button,

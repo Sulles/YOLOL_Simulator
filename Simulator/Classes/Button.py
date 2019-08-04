@@ -9,13 +9,18 @@ This class simulates the functionality of a Button in Starbase. As there are
 three types of buttons, all buttons will have a subclass to inherit all common
 features
 """
-from .pygame_obj import PygameObj
-from pygame import draw as pygame_draw
+
+''' IMPORTS '''
+if __name__ == "__main__":
+    # noinspection PyUnresolvedReferences
+    from pygame_obj import PygameObj
+else:
+    from .pygame_obj import PygameObj
 
 
 # This is the sub-class
 class _button(PygameObj):
-    def __init__(self, name, state, on_state, off_state, style, position, width, height, color_map, shapes):
+    def __init__(self, name, state, on_state, off_state, style, center, width, height, color_map, shapes):
         """
         :param state: The current state of the button
         :param on_state: The state which signifies button is in 'on state'
@@ -24,7 +29,7 @@ class _button(PygameObj):
             0: Hold down and release
             1: Basic Toggle (simple click to toggle)
             2: 4-state switch (like a click pen)
-        :param position: The position of the button on the main surface
+        :param center: The center pixel of the button on the main surface
         :param color_map: The color map for all potential states of the button
         """
         # Button parameters
@@ -36,7 +41,7 @@ class _button(PygameObj):
         self.maxstate = 0
 
         # Pygame object init
-        PygameObj.__init__(self, position, width, height, color_map, shapes)
+        PygameObj.__init__(self, center, width, height, color_map, shapes)
 
         # Assertions
         self.run_assert()
@@ -67,9 +72,9 @@ class _button(PygameObj):
               "Current State: {1}\n"
               "On State: {2}\n"
               "Off State: {3}\n"
-              "Position: {4}\n"
+              "center: {4}\n"
               "Width/Height: {5}/{6}\n"
-              "Color: {7}".format(self.name, self.buttonstate, self.buttononstate, self.buttonoffstate, self.position,
+              "Color: {7}".format(self.name, self.buttonstate, self.buttononstate, self.buttonoffstate, self.center,
                                   self.width, self.height, self.color))
 
 
@@ -77,18 +82,18 @@ class _button(PygameObj):
 class Button(_button):
     def __init__(self, input_settings):
         settings = {'name': "", 'state': 0, 'on_state': 1, 'off_state': 0, 'style': 0,
-                    'position': [0, 0], 'width': 20, 'height': 40, 'color_map': (100, 100, 100),
+                    'center': [0, 0], 'width': 20, 'height': 40, 'color_map': (100, 100, 100),
                     'shapes': [
                         {'type': 'rect',
                          'color': (175, 175, 175),
                          'settings':
-                             {'position': input_settings['position'],
+                             {'center': [0, 0],
                               'width': 20,
                               'height': 40}},
                         {'type': 'rect',
                          'color': None,
                          'settings':
-                             {'position': [input_settings['position'][0] + 5, input_settings['position'][1] + 5],
+                             {'center': [0, 0],
                               'width': 10,
                               'height': 30}}]}
 
@@ -99,9 +104,8 @@ class Button(_button):
         # Handle shape of button, define generic button
         if 'shapes' not in input_settings:
             input_settings['shapes'] = \
- \
                 _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
-                                 settings['style'], settings['position'], settings['width'], settings['height'],
+                                 settings['style'], settings['center'], settings['width'], settings['height'],
                                  settings['color_map'], settings['shapes'])
 
     def _handle_action(self, action_type):
@@ -142,9 +146,18 @@ class Button0(Button):
 # Unit test
 if __name__ == "__main__":
     print("Running unit test for Button class...")
-    butt = Button({"name": 'Test', "state": 1, "on_state": 2, "off_state": 0, "style": 2})
+    butt = Button0({'name': 'butt_name',
+                    'state': 0,
+                    'center': [0, 0]})
     butt.print()
     print("")
     print("Updating current state...")
-    butt.update_state(2)
+    butt.update_state(1)
     butt.print()
+
+    try:
+        butt.increment_state()
+        if butt.buttonstate not in range(butt.maxstate):
+            print('UNIT TEST ERROR: This should have failed!')
+    except AssertionError:
+        pass

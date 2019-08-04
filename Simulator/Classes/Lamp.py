@@ -7,7 +7,14 @@ Author: StolenLight
 === DESCRIPTION ===
 This class simulates the funtionality of a Lamp in Starbase.
 """
-from .pygame_obj import PygameObj
+
+''' IMPORTS '''
+if __name__ == "__main__":
+    # noinspection PyUnresolvedReferences
+    from pygame_obj import PygameObj
+else:
+    from .pygame_obj import PygameObj
+import colorsys
 
 
 class Lamp(PygameObj):
@@ -17,27 +24,34 @@ class Lamp(PygameObj):
             Expected dictionary keys are: name, on, lumens, hue, saturation,
                 value, and range.
         """
-        settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 200, 'saturation': 0.5, 'value': 0.5, 'range': 10,
-                    'position': [0, 0], 'width': 30, 'height': 20, 'color_map': [(255, 255, 255), (0, 0, 0)],
+        settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 360, 'saturation': 0, 'value': 200, 'range': 10,
+                    'center': [0, 0], 'width': 30, 'height': 30,
+                    'color_map': [colorsys.hsv_to_rgb(360, 0, 200), (0, 0, 0)],
                     'shapes': [
                         {'type': 'circle',
                          'color': None,
                          'settings':
-                             {'position': [input_settings['position'][0] + 15, input_settings['position'][1] + 10],
+                             {'center': [0, 0],
                               'radius': 50}},
                         {'type': 'rect',
+                         'color': (0, 0, 0),
+                         'width': 2,
+                         'settings':
+                             {'center': [0, 0],
+                              'width': 30,
+                              'height': 30}},
+                        {'type': 'circle',
                          'color': (225, 225, 0),
                          'settings':
-                             {'position': input_settings['position'],
-                              'width': 30,
-                              'height': 20}}]}
+                             {'center': [0, 0],
+                              'radius': 10}}]}
 
         for set in settings.keys():
             if set in input_settings:
                 settings[set] = input_settings[set]
 
         # Pygame object init
-        PygameObj.__init__(self, settings['position'], settings['width'], settings['height'],
+        PygameObj.__init__(self, settings['center'], settings['width'], settings['height'],
                            settings['color_map'],
                            settings['shapes'])
 
@@ -90,7 +104,9 @@ class Lamp(PygameObj):
 
 # Unit test
 if __name__ == "__main__":
-    lamp = Lamp({"on": True, "lumens": 500, "hue": 150, "saturation": 0.8, "value": 0.2, "range": 8})
+    lamp = Lamp({'name': 'lamp_name',
+                 'state': 1,
+                 'center': [0, 0]})
     lamp.print()
     lamp.toggle_on_off()
     lamp.print()
