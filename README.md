@@ -1,6 +1,11 @@
 # YOLOL Simulator
 This project strives to simulate the interaction between YOLOL code and all objects within its network
 
+#### Controls:
+- Left-click sends 'action' to object (one for Down, and one for Up)
+- Right-click-down snaps nearest object to cursor
+- Right-click-up releases selected object
+
 ### This project uses CYLON AST v0.3.0
 - YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
 - Current use of this program requires using Discord bot to get CYLON AST, would be nice to have a back-end
@@ -12,17 +17,22 @@ This project strives to simulate the interaction between YOLOL code and all obje
 
 ## Working on...
 
-### Pygame Simulator Framework (25% complete)
+### Pygame Simulator Framework (35% complete)
 - GUI (15%)
-- Displaying Devices (30%)
+- Displaying Devices (50%)
 
-### Integrate Pythonized Yolol Code into Simulator (0% complete)
+### Integrate Pythonized Yolol Code into Simulator through YOLOL Chips (0% complete)
+
+### Automate YOLOL to CYLON AST to Python (30% complete - waiting on Yoloxide backend)
+
+### Create UI to create Network with specific components (5% complete)
+It will be possible to create custom 'textures' for all components. Need to implement this with setup.
 
 ### Python Emulator Object Classes and Network (5% complete)
 #### Currently supported devices
 - YOLOL Chip (20%)
-- Button (90%)
-- Lamp (95%)
+- Button (95%)
+- Lamp (99%)
 
 #### Planned devices
 - Cargo beam
