@@ -1,7 +1,16 @@
 # YOLOL Simulator
 This project strives to simulate the interaction between YOLOL code and all objects within its network
 
-## Current Progress
+### This project uses CYLON AST v0.3.0
+- YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
+- Current use of this program requires using Discord bot to get CYLON AST, would be nice to have a back-end
+
+## Completed
+
+### CYLON AST To Python Converter v0.1 (100% complete)
+- Could use better unit tests
+
+## Working on...
 
 ### Pygame Simulator Framework (25% complete)
 - GUI (15%)
@@ -48,14 +57,6 @@ This project strives to simulate the interaction between YOLOL code and all obje
 #### Not currently planning to support:
 - Flight control unit
 - Main flight computer
-
-## Completed
-
-### CYLON AST v0.3.0
-- YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
-- Current use of this program requires using Discord bot to get CYLON AST, would be nice to have a back-end
-### CYLON AST To Python Converter v0.1 (100% complete)
-- Could use better unit tests
 
 ## Want to Contribute?
 This is an open source project and all contributions are welcome! Feel free to join the discord channel dedicated to CYLONS https://discord.gg/rmu6aCr and PM me (username=StolenLight) and I would be more than happy to discuss how you would like to help!
