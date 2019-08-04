@@ -7,6 +7,8 @@ This project strives to simulate the interaction between YOLOL code and all obje
 - GUI (15%)
 - Displaying Devices (30%)
 
+### Integrate Pythonized Yolol Code into Simulator (0% complete)
+
 ### Python Emulator Object Classes and Network (5% complete)
 #### Currently supported devices
 - YOLOL Chip (20%)
