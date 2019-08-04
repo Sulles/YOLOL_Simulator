@@ -36,7 +36,7 @@ def simulator():
     gui = GUI(DISPLAY)
 
     # Initialize Network here
-    network_settings = {'Button':
+    network_settings = {'Button0':
                             {'name': 'butt_name',
                              'state': 0,
                              'position': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
@@ -72,23 +72,18 @@ def simulator():
             elif event.type == MOUSEBUTTONDOWN:
                 # pprint(vars(event))
                 if event.button == 3:  # right click
-                    print("Right click found!")
+                    print('Right click found: {}'.format(event.pos))
                     # engine.add_body(event.pos, (0, 0), (0, 0), 0, 1, randint(10, 50))
                 elif event.button == 1:  # left click
-                    print("Left click found!")
-                    # if not selected_eid and engine.bm.len() > 0:
-                    #     selected_eid = \
-                    #         min([(abs(b[0][0] - event.pos[0]) + abs(b[0][1] - event.pos[1]), b[2]) for b in
-                    #              engine.bodies()],
-                    #             key=lambda x: x[0])[1]  # get eid of closest body
-                    # else:
-                    #     selected_eid = None
+                    print('Left click found: {}'.format(event.pos))
+                    network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
         surface.fill(colors['BGCOLOR'])
 
         # Drawing objects
-        for obj in network.get_objects():
-            pygame.draw.rect(surface, obj.color, obj.rect)
+        network.draw(surface)
+        # for obj in network.get_objects():
+        #     pygame.draw.rect(surface, obj.color, obj.rect)
 
         # Drawing GUI
         gui.draw(surface)

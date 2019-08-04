@@ -10,11 +10,12 @@ three types of buttons, all buttons will have a subclass to inherit all common
 features
 """
 from .pygame_obj import PygameObj
+from pygame import draw as pygame_draw
 
 
 # This is the sub-class
 class _button(PygameObj):
-    def __init__(self, name, state, on_state, off_state, style, position, width, height, color_map):
+    def __init__(self, name, state, on_state, off_state, style, position, width, height, color_map, shapes):
         """
         :param state: The current state of the button
         :param on_state: The state which signifies button is in 'on state'
@@ -32,9 +33,10 @@ class _button(PygameObj):
         self.buttononstate = on_state
         self.buttonoffstate = off_state
         self.buttonstyle = style
+        self.maxstate = 0
 
         # Pygame object init
-        PygameObj.__init__(self, position, width, height, color_map)
+        PygameObj.__init__(self, position, width, height, color_map, shapes)
 
         # Assertions
         self.run_assert()
@@ -43,19 +45,21 @@ class _button(PygameObj):
         if self.buttonstyle == 0 or self.buttonstyle == 1:
             assert self.buttonstate in range(0, 2), \
                 'INVALID BUTTON STATE: Button Style "%s" only allows for 2 states' % self.buttonstyle
+            self.maxstate = 2
         elif self.buttonstyle == 2:
             assert self.buttonstate in range(0, 5), \
                 'INVALID BUTTON STATE: Button Style "%s" only allows for 4 states' % self.buttonstyle
+            self.maxstate = 5
+
+    def increment_state(self):
+        self.update_state((self.buttonstate + 1) % self.maxstate)
 
     def update_state(self, new_state):
-        print("Button {0} updated state from {1} to {2}".format(
+        print('Button "{0}" updated state from {1} to {2}'.format(
             self.name, self.buttonstate, new_state))
         self.buttonstate = new_state
         self.run_assert()
-        self.update_color()
-
-    def update_color(self):
-        self.color = self.color_map[self.buttonstate]
+        self._update_color(self.buttonstate)
 
     def _print(self):
         print("=== BUTTON INFORMATION ===\n"
@@ -70,23 +74,69 @@ class _button(PygameObj):
 
 
 # This is the main button class
-# TODO: Add button style specific settings
 class Button(_button):
     def __init__(self, input_settings):
         settings = {'name': "", 'state': 0, 'on_state': 1, 'off_state': 0, 'style': 0,
-                    'position': [0, 0], 'width': 10, 'height': 20, 'color_map': (100, 100, 100)}
+                    'position': [0, 0], 'width': 20, 'height': 40, 'color_map': (100, 100, 100),
+                    'shapes': [
+                        {'type': 'rect',
+                         'color': (175, 175, 175),
+                         'settings':
+                             {'position': input_settings['position'],
+                              'width': 20,
+                              'height': 40}},
+                        {'type': 'rect',
+                         'color': None,
+                         'settings':
+                             {'position': [input_settings['position'][0] + 5, input_settings['position'][1] + 5],
+                              'width': 10,
+                              'height': 30}}]}
 
         for set in settings.keys():
             if set in input_settings:
                 settings[set] = input_settings[set]
 
-        _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
-                         settings['style'], settings['position'], settings['width'], settings['height'],
-                         settings['color_map'])
+        # Handle shape of button, define generic button
+        if 'shapes' not in input_settings:
+            input_settings['shapes'] = \
+ \
+                _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
+                                 settings['style'], settings['position'], settings['width'], settings['height'],
+                                 settings['color_map'], settings['shapes'])
+
+    def _handle_action(self, action_type):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            self.increment_state()
 
     # MISC
     def print(self):
         self._print()
+
+
+# Button0 is the 'hold down and release' button
+class Button0(Button):
+    def __init__(self, input_settings):
+        # Handle unique properties for Button 0
+        if 'style' not in input_settings:
+            input_settings['style'] = 0
+        else:
+            assert input_settings['style'] == 0, 'INVALID STYLE FOR BUTTON 0'
+
+        if 'color_map' in input_settings:
+            assert len(input_settings['color_map']) >= 2, 'NEED AT LEAST TWO COLORS'
+        else:
+            input_settings['color_map'] = [(255, 0, 0), (0, 255, 0)]
+
+        Button.__init__(self, input_settings)
+
+    def handle_action(self, action_type):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            self.increment_state()
+        if action_type == 'LEFT_MOUSE_UP':
+            self.increment_state()
+
+    def draw(self, surface):
+        self._draw(surface)
 
 
 # Unit test

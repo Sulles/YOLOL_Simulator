@@ -57,6 +57,9 @@ class Chip(_chip):
     def print(self):
         self._print()
 
+    def draw(self):
+        pass
+
 
 # Unit test
 if __name__ == "__main__":

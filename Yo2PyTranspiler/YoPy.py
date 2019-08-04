@@ -1,11 +1,20 @@
 
+
 # NEW LINE!
 
-#  if elif end (end)
-if var == 0: 	# START INDENT
-    endres = 1 	# END INDENT
+a = 1
+GLOBAL_b += 2
+c -= 3
+d *= 4
+e /= 5
+h %= 2
 
-else: 	# START INDENT
-    if var == 1: 	# START INDENT
-        endres = 2 	# END INDENT
-    # END INDENT 	# END INDENT
+# NEW LINE!
+
+i = "hello"
+GLOBAL_j = "world"
+k = i + " world"
+
+# NEW LINE!
+
+chain = a + GLOBAL_b - c * (d / (e + h) + k)

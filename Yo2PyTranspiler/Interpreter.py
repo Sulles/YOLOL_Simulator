@@ -81,7 +81,7 @@ def parse(line):
     :param line: JSON structure of the line to parse
     :return: N/A
     """
-    YoPy.write('\n# NEW LINE!\n')
+    YoPy.write('\n\n# NEW LINE!\n')
     # print('NEW LINE!')
     if len(line['comment']) > 0:
         YoPy.write('\n# {}'.format(line['comment']))

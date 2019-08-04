@@ -18,11 +18,28 @@ class Lamp(PygameObj):
                 value, and range.
         """
         settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 200, 'saturation': 0.5, 'value': 0.5, 'range': 10,
-                    'position': [0, 0], 'width': 30, 'height': 10, 'color_map': [(255, 255, 255)]}
+                    'position': [0, 0], 'width': 30, 'height': 20, 'color_map': [(255, 255, 255), (0, 0, 0)],
+                    'shapes': [
+                        {'type': 'circle',
+                         'color': None,
+                         'settings':
+                             {'position': [input_settings['position'][0] + 15, input_settings['position'][1] + 10],
+                              'radius': 50}},
+                        {'type': 'rect',
+                         'color': (225, 225, 0),
+                         'settings':
+                             {'position': input_settings['position'],
+                              'width': 30,
+                              'height': 20}}]}
 
         for set in settings.keys():
             if set in input_settings:
                 settings[set] = input_settings[set]
+
+        # Pygame object init
+        PygameObj.__init__(self, settings['position'], settings['width'], settings['height'],
+                           settings['color_map'],
+                           settings['shapes'])
 
         self.name = settings['name']
         self.lampon = settings['on']
@@ -34,17 +51,14 @@ class Lamp(PygameObj):
 
         self.lamplumens = self.lampcolorhue = self.lampcolorsaturation = \
             self.lampcolorvalue = self.lamprange = None
-        self._enable_disable()
-
-        # Pygame object init
-        PygameObj.__init__(self, settings['position'], settings['width'], settings['height'], settings['color_map'])
+        self.enable_disable()
 
     def toggle_on_off(self):
         if self.lampon:
             self.lampon = False
         else:
             self.lampon = True
-        self._enable_disable()
+        self.enable_disable()
 
     def print(self):
         print("=== LAMP INFORMATION ===\n"
@@ -58,12 +72,20 @@ class Lamp(PygameObj):
             self.name, self.lampon, self.lamplumens, self.lampcolorhue,
             self.lampcolorsaturation, self.lampcolorvalue, self.lamprange))
 
-    def _enable_disable(self):
+    def enable_disable(self):
         self.lamplumens = self.lumens_list[self.lampon]
         self.lampcolorhue = self.hue_list[self.lampon]
         self.lampcolorsaturation = self.saturation_list[self.lampon]
         self.lampcolorvalue = self.value_list[self.lampon]
         self.lamprange = self.range_list[self.lampon]
+        self._update_color(self.lampon)
+
+    def draw(self, surface):
+        self._draw(surface)
+
+    def handle_action(self, action_type):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            self.toggle_on_off()
 
 
 # Unit test

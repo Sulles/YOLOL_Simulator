@@ -22,9 +22,13 @@ class Network:
         This would create a Button with name 'butt_name' and ButtonState 0
         """
         self.name = name
+        self.update_flag = False
         self.objects = []
-        for obj in obj_settings.keys():
-            self.objects.append(obj_map[obj](obj_settings[obj]))
+        for ob_set in obj_settings.keys():
+            self.objects.append(obj_map[ob_set](obj_settings[ob_set]))
+
+        for obj in self.objects:
+            print('Created new object: %s with hitbox: %s' % (obj.name, obj.hit_box))
 
     def print(self):
         print("=== NETWORK INFORMATION ===\n"
@@ -33,6 +37,25 @@ class Network:
 
         for obj in self.objects:
             obj.print()
+
+    def handle_action(self, action_location, action_type=None):
+        """
+        This is the main function that will handle user actions done through pygame
+        :param action_location: A list of x, y coords where user action occurred
+        :param action_type: The type of action that the user requested
+        """
+        for obj in self.objects:
+            if action_location[0] in range(obj.hit_box[0][0], obj.hit_box[0][1]) and \
+                    action_location[1] in range(obj.hit_box[1][0], obj.hit_box[1][1]):
+                obj.handle_action(action_type)
+
+    def draw(self, surface):
+        """
+        This function is called to handle drawing all devices
+        :param surface: Pygame Surface to draw everything on
+        """
+        for obj in self.objects:
+            obj.draw(surface)
 
     def get_objects(self):
         return [_ for _ in self.objects]
