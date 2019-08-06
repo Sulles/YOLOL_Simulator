@@ -22,6 +22,7 @@ else:
 class _button(PygameObj):
     def __init__(self, name, state, on_state, off_state, style, center, width, height, color_map, shapes):
         """
+        Initializer for sub-class of all buttons
         :param state: The current state of the button
         :param on_state: The state which signifies button is in 'on state'
         :param off_state: The state which signifies button is in 'off state'
@@ -72,7 +73,7 @@ class _button(PygameObj):
               "Current State: {1}\n"
               "On State: {2}\n"
               "Off State: {3}\n"
-              "center: {4}\n"
+              "Center: {4}\n"
               "Width/Height: {5}/{6}\n"
               "Color: {7}".format(self.name, self.buttonstate, self.buttononstate, self.buttonoffstate, self.center,
                                   self.width, self.height, self.color))
@@ -101,10 +102,7 @@ class Button(_button):
             if set in input_settings:
                 settings[set] = input_settings[set]
 
-        # Handle shape of button, define generic button
-        if 'shapes' not in input_settings:
-            input_settings['shapes'] = \
-                _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
+        _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
                                  settings['style'], settings['center'], settings['width'], settings['height'],
                                  settings['color_map'], settings['shapes'])
 

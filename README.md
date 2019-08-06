@@ -30,7 +30,7 @@ It will be possible to create custom 'textures' for all components. Need to impl
 
 ### Python Emulator Object Classes and Network (5% complete)
 #### Currently supported devices
-- YOLOL Chip (20%)
+- YOLOL Chip (25%)
 - Button (95%)
 - Lamp (99%)
 

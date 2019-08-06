@@ -21,8 +21,7 @@ class Lamp(PygameObj):
     def __init__(self, input_settings):
         """
         :param input_settings: dictionary of settings.
-            Expected dictionary keys are: name, on, lumens, hue, saturation,
-                value, and range.
+            Expected dictionary keys are: name, on, lumens, hue, saturation, value, range, center, width and height
         """
         settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 360, 'saturation': 0, 'value': 200, 'range': 10,
                     'center': [0, 0], 'width': 30, 'height': 30,
