@@ -18,11 +18,13 @@ for root, dirs, files in os.walk("/mydir"):
 if __name__ == "__main__":
     # noinspection PyUnresolvedReferences
     from pygame_obj import PygameObj
+    # noinspection PyUnresolvedReferences
+    from YoPy.Interpreter import *
 else:
     from .pygame_obj import PygameObj
-import importlib
+    from .YoPy.Interpreter import *
 import os
-import re
+import threading
 
 
 # This is the sub-class
@@ -42,23 +44,74 @@ class _chip(PygameObj):
         self.name = name
         self.chipwait = wait
         self.style = style
+        self.total_lines = 0
+        self.current_line = 0
+        self.running = False
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
 
-        # Code parse & import
-        self.YoPyfile = open('YoPy/{}.txt'.format(name), 'r')
-        self.lines = re.search(r'lines: [0-9]{0,2}', self.YoPyfile.read())[-2:]     # grab only numbers
-        self.YoPyfile.close()
-        # ?
-        importlib.import_module('YoPy.{}.txt'.format(self.name))
+        try:
+            CylonAST = open('YoPy/{}.txt'.format(name), 'r')
+            YoPy = open('YoPy/YoPy_{}.py'.format(name), 'w+')
+            print('Found: {}.txt'.format(name))
+        except Exception:
+            print('Ruh roh! Could not read/write either YoPy/{0}.txt or YoPy/YoPy_{0}.py !'.format(name))
+            raise
+
+        json_struct = json.loads(CylonAST.read())
+        # print(json.dumps(json_struct, indent=2, sort_keys=True))
+
+        # create global list of all identifiers used in YOLOL script
+        self.kwargs = list()
+
+        for line in json_struct['program']['lines']:
+            self.total_lines += 1
+            parse(line, YoPy)
+
+        handle_lines(YoPy)
+        local_identifiers, all_identifiers = handle_variables(json_struct, YoPy)
+        # convert all_identifiers to dictionary
+        self.kwargs = dict()
+        for _ in all_identifiers:
+            self.kwargs[str(_)] = 0
+        # print('Found {0} unique identifiers: {1}'.format(len(global_identifiers), global_identifiers))
+        handle_indents(YoPy)
+
+        CylonAST.close()
+        YoPy.close()
+
+        # TODO: this is almost done!
+        self.line_0 = __import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_0']).line_0
+
+        print('testing calling lines...')
+        self.line_0(self.kwargs)
 
     def _print(self):
         print("=== CHIP INFORMATION ===")
         print("Chip Name: {0}\n"
               "Chip Wait: {1}\n"
               "Chip Style: {2}\n"
-              "Number of lines: {3}".format(self.name, self.chipwait, self.style, self.lines))
+              "Number of lines: {3}".format(self.name, self.chipwait, self.style, self.total_lines))
+
+    def run_next_line(self):
+        if not self.running:
+            self.running = True
+            # Thread this:
+            # self.call_line((self.current_line + 1) % self.lines)
+        else:
+            return
+
+    # def call_line(self, line):
+    #     """
+    #
+    #     :return:
+    #     """
+    #     self.kwargs, next_line = 1, 2
+    #     self.running = False
+    #     if next_line:
+    #         self.current_line = line
+    #         self.call_line(next_line)
 
 
 # This is the main chip class
@@ -79,7 +132,7 @@ class Chip(_chip):
             if set in input_settings:
                 settings[set] = input_settings[set]
 
-        _chip.__init__(self, settings['name'], settings['name'], settings['style'], settings['center'],
+        _chip.__init__(self, settings['name'], settings['wait'], settings['style'], settings['center'],
                        settings['width'], settings['height'], settings['color_map'], settings['shapes'])
 
     def print(self):
@@ -92,5 +145,5 @@ class Chip(_chip):
 # Unit test
 if __name__ == "__main__":
     print("Running unit test for Chip class...")
-    chip = Chip("")
+    chip = Chip({'name': "test_chip"})
     chip.print()

@@ -39,7 +39,7 @@ class PygameObj:
 
         self.drawable_shapes = []
         for shape_def in shapes:
-            print('Got new shape definition!')
+            # print('Got new shape definition!')
 
             if 'width' not in shape_def or shape_def['width'] is None:
                 shape_def['width'] = 0
