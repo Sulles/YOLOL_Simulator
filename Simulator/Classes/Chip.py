@@ -4,6 +4,9 @@ Last Updated:
 
 Author: StolenLight
 
+TODO: Make _chip dynamically create line functions with:
+    https://stackoverflow.com/questions/3687682/python-define-dynamic-functions?lq=1
+
 === DESCRIPTION ===
 This class simulates the functionality of a YOLOL Chip in Starbase. As there are
 three types of chips, all chips will have a subclass to inherit all common
@@ -14,7 +17,10 @@ for root, dirs, files in os.walk("/mydir"):
         if file.endswith(".txt"):
              print(os.path.join(root, file))
 """
-''' IMPORTS '''
+import os
+import threading
+from time import sleep, time
+
 if __name__ == "__main__":
     # noinspection PyUnresolvedReferences
     from pygame_obj import PygameObj
@@ -23,8 +29,6 @@ if __name__ == "__main__":
 else:
     from .pygame_obj import PygameObj
     from .YoPy.Interpreter import *
-import os
-import threading
 
 
 # This is the sub-class
@@ -44,9 +48,11 @@ class _chip(PygameObj):
         self.name = name
         self.chipwait = wait
         self.style = style
+        self.run_line = True
+        self.last_run = time()
+        self.lines = list()
         self.total_lines = 0
-        self.current_line = 0
-        self.running = False
+        self.current_line = 1
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -59,59 +65,95 @@ class _chip(PygameObj):
             print('Ruh roh! Could not read/write either YoPy/{0}.txt or YoPy/YoPy_{0}.py !'.format(name))
             raise
 
+        # Reading JSON Cylon AST file
         json_struct = json.loads(CylonAST.read())
-        # print(json.dumps(json_struct, indent=2, sort_keys=True))
 
-        # create global list of all identifiers used in YOLOL script
+        # Creating global list of all identifiers used in YOLOL script
         self.kwargs = list()
 
+        # Parse JSON structure...
         for line in json_struct['program']['lines']:
             self.total_lines += 1
             parse(line, YoPy)
-
         handle_lines(YoPy)
         local_identifiers, all_identifiers = handle_variables(json_struct, YoPy)
-        # convert all_identifiers to dictionary
         self.kwargs = dict()
-        for _ in all_identifiers:
+        for _ in all_identifiers:  # convert all_identifiers to dictionary
             self.kwargs[str(_)] = 0
-        # print('Found {0} unique identifiers: {1}'.format(len(global_identifiers), global_identifiers))
         handle_indents(YoPy)
+        YoPy.write('\n')
 
+        # Close files
         CylonAST.close()
         YoPy.close()
 
-        # TODO: this is almost done!
-        self.line_0 = __import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_0']).line_0
-
-        print('testing calling lines...')
-        self.line_0(self.kwargs)
+        # Import each line into Chip object
+        try:
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_1']).line_1)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_2']).line_2)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_3']).line_3)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_4']).line_4)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_5']).line_5)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_6']).line_6)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_7']).line_7)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_8']).line_8)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_9']).line_9)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_10']).line_10)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_11']).line_11)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_12']).line_12)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_13']).line_13)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_14']).line_14)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_15']).line_15)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_16']).line_16)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_17']).line_17)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_18']).line_18)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_19']).line_19)
+            self.lines.append(__import__('YoPy.YoPy_{}'.format(self.name), globals(), locals(), ['line_20']).line_20)
+        except AttributeError as e:
+            print('Parsed all lines, found %d!' % len(self.lines))
+            for x in range(len(self.lines), 20):
+                self.lines.append(None)
+            pass
+        except Exception as e:
+            print('Unexpected Error! %s' % e)
+            raise
 
     def _print(self):
         print("=== CHIP INFORMATION ===")
         print("Chip Name: {0}\n"
               "Chip Wait: {1}\n"
               "Chip Style: {2}\n"
-              "Number of lines: {3}".format(self.name, self.chipwait, self.style, self.total_lines))
+              "Number of lines: {3}\n"
+              "All variables: {4}".format(self.name, self.chipwait, self.style, self.total_lines, self.kwargs))
 
-    def run_next_line(self):
-        if not self.running:
-            self.running = True
-            # Thread this:
-            # self.call_line((self.current_line + 1) % self.lines)
+    def _run_next_line(self):
+        if not self.run_line:
+            print('ERROR: Chip disabled!')
+            return False
+        elif time() - self.last_run >= 0.2:
+            self.last_run = time()
+            print('Starting to execute line %d' % self.current_line)
+            if self.lines[self.current_line - 1] is not None:
+                self.kwargs, goto = self.lines[self.current_line - 1](self.kwargs)
+                # print('(=) Updated kwargs: {}'.format(self.kwargs))
+                if goto:
+                    # print('Got goto: %d' % goto)
+                    self.current_line = goto
+            return True
         else:
-            return
+            print('ERROR: Tried to run next line too soon!')
+            return False
 
-    # def call_line(self, line):
-    #     """
-    #
-    #     :return:
-    #     """
-    #     self.kwargs, next_line = 1, 2
-    #     self.running = False
-    #     if next_line:
-    #         self.current_line = line
-    #         self.call_line(next_line)
+    def _handle_action(self, action_type):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            print('self.run_thread?: {}'.format(self.run_line))
+            if not self.run_line:
+                self.run_line = True
+                print('Got command to start next line!')
+                self._run_next_line()
+            else:
+                print('Cancelling %s execution...' % self.name)
+                self.run_line = False
 
 
 # This is the main chip class
@@ -141,9 +183,25 @@ class Chip(_chip):
     def draw(self, surface):
         self._draw(surface)
 
+    def step(self):
+        return self._run_next_line()
+
+    def disable(self):
+        self.run_line = False
+
 
 # Unit test
 if __name__ == "__main__":
     print("Running unit test for Chip class...")
     chip = Chip({'name': "test_chip"})
     chip.print()
+    print('testing calling lines...')
+    if not chip.step():
+        print('Correctly failed')
+    sleep(0.2)
+    if chip.step():
+        print('Correctly passed')
+    chip.disable()
+    sleep(0.2)
+    if not chip.step():
+        print('Correctly failed')

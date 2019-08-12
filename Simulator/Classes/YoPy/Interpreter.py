@@ -29,6 +29,8 @@ def __main__():
     # print('Found {0} unique identifiers: {1}'.format(len(global_identifiers), global_identifiers))
     handle_indents(YoPy)
 
+    YoPy.write('\n')
+
     CylonAST.close()
     YoPy.close()
 
@@ -39,7 +41,7 @@ def handle_lines(YoPy):
     :return:
     """
     YoPy.seek(0, 0)
-    line_number = 0
+    line_number = 1
     output = "from time import sleep"
     for line in YoPy.readlines():
         if re.search(r'# NEW LINE!', line):
@@ -180,7 +182,7 @@ def parse(line, YoPy):
     :param line: JSON structure of the line to parse
     :return: N/A
     """
-    YoPy.write('\n\n# NEW LINE!\n\nsleep(0.2)')
+    YoPy.write('\n\n# NEW LINE!\n')
     # print('NEW LINE!')
     if len(line['comment']) > 0:
         YoPy.write('\n# {}'.format(line['comment']))
@@ -195,11 +197,12 @@ def parse(line, YoPy):
                 print('code bit: {}'.format(code_bit))
                 print('expression: {}'.format(code_bit['expression']))
                 print('num? {}'.format(code_bit['expression']['num']))
-                print('found goto! creating call to function %d' % (int(code_bit['expression']['num']) - 1))
-                YoPy.write('\nline_%d(kwargs)' % (int(code_bit['expression']['num']) - 1))
+                print('found goto! adding line in next_lines list: %d' % (int(code_bit['expression']['num'])))
+                YoPy.write('\nreturn kwargs, %d' % (int(code_bit['expression']['num'])))
+                return
             else:
                 print('Got code bit: "%s"' % code_bit)
-    YoPy.write('\nreturn kwargs')
+    YoPy.write('\nreturn kwargs, None')
     return
 
 
@@ -243,7 +246,7 @@ def handle_assignment(value):
     """
     This function handles the different types of values an assignment statement can be
     """
-    print('handling value: "{}"'.format(value))
+    # print('handling value: "{}"'.format(value))
 
     if not isinstance(value, dict):
         # print('What did you pass?!')
