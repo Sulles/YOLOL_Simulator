@@ -17,29 +17,27 @@ Could use better unit tests, see Known Issues below, needs to be fixed
 
 ## Current Work In Progress (Planned for 0.1 Release) 90% Complete
 
-#### GUI (15% complete of 25%)
+### GUI (15% complete of 25%)
 It will be possible to create custom 'textures' for all components. Need to implement this with setup.
-
 GUI needs to show all objects in a network as well as their states
-
 Need to create instructions screen page
 
-#### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (90% complete of 100%)
+### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (90% complete of 100%)
 Need to link YOLOL external variables to objects in the network and allow user to modify an object's 'external variables' names
 
-#### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
+### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
 
-#### Create UI to create Network with specific components (5% complete of 25%)
+### Create UI to create Network with specific components (5% complete of 25%)
 
-#### Create GUI for YOLOL Chip interaction (0% complete of 10%)
+### Create GUI for YOLOL Chip interaction (0% complete of 10%)
 
-#### Python Emulator Object Classes and Network (9% complete of 9.4%)
-##### Planned devices for 0.1 Release 
+### Python Emulator Object Classes and Network (9% complete of 9.4%)
+#### Planned devices for 0.1 Release 
 - YOLOL Chip (80%)
 - Button (99%)
 - Lamp (99%)
 
-##### Planned devices for 1.0 Release if not sooner
+#### Planned devices for 1.0 Release if not sooner
 - Cargo beam
 - Carge crate
 - Cargo lock frame
@@ -69,7 +67,7 @@ Need to link YOLOL external variables to objects in the network and allow user t
 - Trigger
 - Turntable
 
-##### Not currently planning to support:
+#### Not currently planning to support:
 - Flight control unit
 - Main flight computer
 
@@ -94,5 +92,5 @@ Starbase wiki link for YOLOL: https://wiki.starbasegame.com/index.php/YOLOL
 
 
 ## Known Issues
-#### Does not properly interpret Cylon AST for:
+### Does not properly interpret Cylon AST for:
 a ++ -- b
