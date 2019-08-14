@@ -6,6 +6,8 @@ Author: StolenLight
 
 === DESCRIPTION ===
 This class houses all the drawing components required for pygame
+
+TODO: Add other pygame object shapes
 """
 
 from pygame import Rect as pygame_rect

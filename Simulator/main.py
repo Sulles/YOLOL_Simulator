@@ -6,6 +6,8 @@ Author: StolenLight
 
 === DESCRIPTION ===
 This is the main simulator code. From here, users can
+
+TODO: Make shift + right click = plane move?
 """
 
 import pygame
@@ -59,7 +61,8 @@ def simulator():
                 terminate()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    terminate()
+                    # Show main screen
+                    pass
 
                 # OBJECT SELECTION
                 # elif selected_eid:
@@ -90,6 +93,7 @@ def simulator():
         if selected_obj:
             selected_obj.set_center(pygame.mouse.get_pos())
 
+        # Re-draw background
         surface.fill(colors['BGCOLOR'])
 
         # Drawing objects

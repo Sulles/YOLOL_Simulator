@@ -1,0 +1,1 @@
+# TODO: make this a config file to change screen size/settings. maybe use JSON to store data?
