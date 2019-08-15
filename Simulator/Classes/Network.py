@@ -29,7 +29,7 @@ class Network:
             self.objects.append(obj_map[ob_set](obj_settings[ob_set]))
 
         for obj in self.objects:
-            print('Created new object: %s with hitbox: %s' % (obj.name, obj.hit_box))
+            print('Created new object: "%s" with hitbox: %s' % (obj.name, obj.hit_box))
 
     def print(self):
         print("=== NETWORK INFORMATION ===\n"

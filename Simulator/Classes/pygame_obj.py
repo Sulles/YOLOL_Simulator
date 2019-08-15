@@ -10,6 +10,7 @@ This class houses all the drawing components required for pygame
 TODO: Add other pygame object shapes
 """
 
+from copy import deepcopy
 from pygame import Rect as pygame_rect
 from pygame import draw as pygame_draw
 
@@ -41,7 +42,7 @@ class PygameObj:
 
         self.drawable_shapes = []
         for shape_def in shapes:
-            # print('Got new shape definition!')
+            # print('Got new shape definition!: {}'.format(shape_def))
 
             if 'width' not in shape_def or shape_def['width'] is None:
                 shape_def['width'] = 0
@@ -92,6 +93,13 @@ class PygameObj:
     def update_hit_box(self):
         self.hit_box = [[self.center[0] - int(self.width / 2), self.center[0] + int(self.width / 2)],
                         [self.center[1] - int(self.height / 2), self.center[1] + int(self.height / 2)]]
+
+    def in_hit_box(self, pos):
+        if pos[0] in range(self.hit_box[0][0], self.hit_box[0][1]) and \
+            pos[1] in range(self.hit_box[1][0], self.hit_box[1][1]):
+            return True
+        else:
+            return False
 
     def create_rect(self, rect_settings):
         """

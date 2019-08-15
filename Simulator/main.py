@@ -23,6 +23,8 @@ from src.constants import colors
 from src.GUI import GUI
 # noinspection PyUnresolvedReferences
 from Classes.Network import Network
+# noinspection PyUnresolvedReferences
+from OptionScreen import OptionScreen
 
 
 def simulator():
@@ -36,6 +38,7 @@ def simulator():
     surface = pygame.display.set_mode((DISPLAY['width'], DISPLAY['height']))
     pygame.display.set_caption('Proving Ground')
     gui = GUI(DISPLAY)
+    option_screen = OptionScreen(DISPLAY)
 
     # Initialize Network here
     network_settings = {'Button0':
@@ -62,7 +65,7 @@ def simulator():
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     # Show main screen
-                    pass
+                    option_screen.handle_action('ESCAPE')
 
                 # OBJECT SELECTION
                 # elif selected_eid:
@@ -77,34 +80,40 @@ def simulator():
                 # pprint(vars(event))
                 if event.button == 3:   # right click
                     print('Right click found: {}'.format(event.pos))
-                    selected_obj = network.get_closest_obj(event.pos)
-                    print('Got closest obj with name: "%s"' % selected_obj.name)
+                    if not option_screen.is_active:
+                        selected_obj = network.get_closest_obj(event.pos)
+                        print('Got closest obj with name: "%s"' % selected_obj.name)
                 elif event.button == 1: # left click
-                    print('Left click found: {}'.format(event.pos))
-                    network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
+                    if option_screen.is_active:
+                        option_screen.handle_action('MOUSE_DOWN', event.pos)
+                    else:
+                        print('Left click found: {}'.format(event.pos))
+                        network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
             elif event.type == MOUSEBUTTONUP:
                 if event.button == 3:   # right click
-                    print('Right mouse up found?')
-                    selected_obj = None
+                    if not option_screen.is_active:
+                        print('Right mouse up found?')
+                        selected_obj = None
                 if event.button == 1:   # left click
-                    network.handle_action(event.pos, action_type='LEFT_MOUSE_UP')
+                    if not option_screen.is_active:
+                        network.handle_action(event.pos, action_type='LEFT_MOUSE_UP')
 
         if selected_obj:
             selected_obj.set_center(pygame.mouse.get_pos())
+
+        # Perform tick update here for YOLOL chips
 
         # Re-draw background
         surface.fill(colors['BGCOLOR'])
 
         # Drawing objects
-        network.draw(surface)
-        # for obj in network.get_objects():
-        #     pygame.draw.rect(surface, obj.color, obj.rect)
-
-        # Drawing GUI
-        gui.draw(surface)
-
-        # Perform tick update here
+        if option_screen.is_active:
+            option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
+            option_screen.draw(surface)
+        else:
+            network.draw(surface)
+            gui.draw(surface)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
