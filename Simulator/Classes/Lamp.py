@@ -25,7 +25,7 @@ class Lamp(PygameObj):
         """
         settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 360, 'saturation': 0, 'value': 200, 'range': 10,
                     'center': [0, 0], 'width': 30, 'height': 30,
-                    'color_map': [colorsys.hsv_to_rgb(360, 0, 200), (0, 0, 0)],
+                    'color_map': [(0, 0, 0), colorsys.hsv_to_rgb(360, 0, 200)],
                     'shapes': [
                         {'type': 'circle',
                          'color': None,
@@ -71,6 +71,7 @@ class Lamp(PygameObj):
             self.lampon = False
         else:
             self.lampon = True
+        print('Lamp "%s" new state is: %d' % (self.name, self.lampon))
         self.enable_disable()
 
     def print(self):

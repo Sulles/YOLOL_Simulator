@@ -20,116 +20,131 @@ Available options:
 
 import pygame
 from Classes.pygame_obj import PygameObj
+from pygame import font
 from math import sqrt
 
 
 class ListObj:
     def __init__(self, list_of_entries, screen_size):
-        if list_of_entries is None or len(list_of_entries) == 0:
-            print('Found no entries! Skipping...')
-            return
-
+        """
+        Constructor
+        :param list_of_entries: a list of strings
+        :param screen_size: list/tuple of length 2 where id 0 = width and id 1 = height
+        :param font: pygame.font.Font object
+        """
         self.entries = list_of_entries
         self.objects = []
-        self.closest_object = 0
+        self.font = font.Font('src/Cubellan.ttf', 16)
+        self.active_entry = None
 
         # print('Instantiating new List Object. List of entries: {}'.format(
         #     list_of_entries))
 
-        top_of_list = int(70 * len(list_of_entries))
-
         for x in range(0, len(list_of_entries)):
             # print('Creating shape for list entry "%s"' % list_of_entries[x])
-            shapes = []
+            shapes = list()
             shapes.append(
                 {'type': 'rect',
                  'color': (255, 255, 255),
                  'width': 2,
                  'settings': {
                      'center': [0, 0],
-                     'width': 200,
+                     'width': 300,
                      'height': 50}})
             shapes.append(
                 {'type': 'rect',
                  'color': None,
                  'settings': {
                      'center': [0, 0],
-                     'width': 180,
+                     'width': 280,
                      'height': 40}})
-            # TODO: Blit text here?
 
             self.objects.append(
                 PygameObj([int(screen_size['width'] / 2) + 100,
-                    int(screen_size['height'] / 2 - (top_of_list / 20) - (70 * x))],
-                    200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes))
+                           int(100 + (70 * x))],
+                          200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes, text=list_of_entries[x],
+                          Font=self.font))
         print('List objects: {}'.format(self.objects))
 
     def draw(self, surface):
         for obj in self.objects:
-            obj._draw(surface)
-        # TODO: blit text to surface here?
+            obj.draw(surface)
 
     def handle_hover(self, mouse_pos):
-        # print('got mouse pos: {}'.format(mouse_pos))
-        distance = []
-        obj_index = []
+        self.active_entry = None
         for obj in self.objects:
-            # print('Got obj with center: "%s"' % obj.center)
-            distance.append(self.distance(obj.center, mouse_pos))
-            obj_index.append(self.objects.index(obj))
-        # print('distance: {}'.format(distance))
-        # print('min distance: {}'.format(min(distance)))
-        # print(self.objects[obj_index[distance.index(min(distance))]])
-        closest_object = obj_index[distance.index(min(distance))]
-        if self.closest_object != closest_object:
-            self.objects[self.closest_object]._update_color(0)
-            self.closest_object = closest_object
-            self.objects[self.closest_object]._update_color(1)
+            if obj.in_hit_box(mouse_pos):
+                obj.update_color(1)
+                self.active_entry = self.objects.index(obj)
+            else:
+                obj.update_color(0)
+
+    def handle_mouse_down(self, mouse_pos):
+        for obj in self.objects:
+            if obj.in_hit_box(mouse_pos):
+                print('Got left click "%s" in list object' % self.entries[self.active_entry])
+                return self.active_entry
+        print('Got un-interesting left click, ignoring')
 
     @staticmethod
     def distance(a, b):
         return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
-    def handle_mouse_down(self, mouse_pos):
-        if self.objects[self.closest_object].in_hit_box(mouse_pos):
-            print('Got left click in "%s"' % self.entries[self.closest_object])
-            # TODO: change level and options display here
-
 
 class OptionScreen:
     def __init__(self, screen_size):
-        self.is_active = True
+        self.is_active = False
 
         # Simple dictionary of all settings, with key as first layer text, and value as sub-layer text
         self.options_text = {
             'Edit networks': ['Add/remove objects from a network', 'Create a new network',
                               'Modify an existing network', 'Delete a network'],
-            'Edit YOLOL code': None,
-            'Edit simulator settings': ['Change screen size', 'Change FPS']
+            'Edit YOLOL code': [],
+            'Edit simulator settings': ['Change screen size', 'Change FPS'],
+            'Exit': []
         }
 
         self.main_list = ListObj([_ for _ in self.options_text.keys()], screen_size)
         self.network_list = ListObj(self.options_text['Edit networks'], screen_size)
         self.yolol_list = ListObj(self.options_text['Edit YOLOL code'], screen_size)
+        # TODO: make sure yolol_list can be updated appropriately, will probably need to create a new obj for each
+        #  new chip created
         self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size)
 
         self.selected_key = None
 
-        self.current_list = []
+        self.current_list_obj = []
         self.update_current_list()
 
     def update_current_list(self):
+        if isinstance(self.selected_key, int) and self.current_list_obj == self.main_list:
+            main_key_map = [_ for _ in self.options_text.keys()]
+            self.selected_key = main_key_map[self.selected_key]
+            print('Mapped key to: "%s"' % self.selected_key)
+
         if self.selected_key is None:
-            self.current_list = self.main_list
+            self.current_list_obj = self.main_list
         elif self.selected_key == 'Edit networks':
-            self.current_list = self.network_list
+            self.current_list_obj = self.network_list
         elif self.selected_key == 'Edit YOLOL code':
-            self.current_list = self.yolol_list
+            if len(self.options_text['Edit YOLOL code']) == 0:
+                print('No YOLOL chips edit!')
+                self.current_list_obj = self.main_list
+                self.selected_key = None
+            else:
+                print('what is yolol list right now? "{}"'.format(self.yolol_list))
         elif self.selected_key == 'Edit simulator settings':
-            self.current_list = self.simulator_list
+            self.current_list_obj = self.simulator_list
+        elif self.selected_key == 'Exit':
+            # returns do_terminate = True to main
+            return True
         else:
             print('what even is the selected key?: {}'.format(self.selected_key))
             raise AttributeError
+
+        if self.current_list_obj is None:
+            print('Nothing to display, returning to main menu...')
+            self.current_list_obj = self.main_list
 
     def toggle_activate(self):
         if self.is_active:
@@ -144,20 +159,19 @@ class OptionScreen:
         self.is_active = False
 
     def draw(self, surface):
-        self.current_list.draw(surface)
+        self.current_list_obj.draw(surface)
 
     def handle_action(self, action_type, mouse_pos=None):
         if action_type == 'ESCAPE' and self.selected_key is not None:
             self.selected_key = None
+            self.update_current_list()
         elif action_type == 'ESCAPE':
             self.toggle_activate()
         elif action_type == 'MOUSE_HOVER':
-            self.current_list.handle_hover(mouse_pos)
+            self.current_list_obj.handle_hover(mouse_pos)
         elif action_type == 'MOUSE_DOWN':
-            # Find which list object mouse is hovering over
-            print(self.current_list.handle_mouse_down(mouse_pos))
-            # Update selected key to represent where mouse click occurred
-            # self.selected_key =
+            self.selected_key = self.current_list_obj.handle_mouse_down(mouse_pos)
+            return self.update_current_list()
         else:
             print('Unsupported action detected! Got: {}'.format(action_type))
             raise AttributeError

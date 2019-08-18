@@ -10,13 +10,13 @@ This class houses all the drawing components required for pygame
 TODO: Add other pygame object shapes
 """
 
-from copy import deepcopy
+# from copy import deepcopy
 from pygame import Rect as pygame_rect
 from pygame import draw as pygame_draw
 
 
 class PygameObj:
-    def __init__(self, center, width, height, color_map, shapes):
+    def __init__(self, center, width, height, color_map, shapes, text=None, Font=None):
         """
         The initializer for the main Pygame object
         :param center: list of length two: is the center of the object, using pixel coordinates
@@ -26,6 +26,8 @@ class PygameObj:
         :param shapes: list of dictionaries of dictionaries, i.e.
             shapes = [{'type': 'rect', 'color': colors['WHITE'], 'settings': {'center': [0, 0], 'width': 10, 'height': 10}},
                       {'type': 'circle', 'color': None, 'settings: {'center': [20, 20], 'radius': 5}}]
+        :param text: text to be shown, used for options screen, maybe object names in the future?
+        :param Font: pygame.font.Font to use for creating text
         """
         if isinstance(color_map, tuple):
             color_map = [color_map]
@@ -39,6 +41,14 @@ class PygameObj:
         self.color_map = color_map
         self.color = color_map[0]
         self.shape_def = shapes
+        self.text = text
+        self.font = Font
+        if text is not None and Font is not None:
+            self.text_render = Font.render(text, True, (255, 255, 255))
+            self.text_rect = self.text_render.get_rect()
+            self.text_rect.center = self.center
+        else:
+            self.text_render = None
 
         self.drawable_shapes = []
         for shape_def in shapes:
@@ -72,6 +82,8 @@ class PygameObj:
         self.color = self.color_map[map_index]
         # print('Current color: {}'.format(self.color))
 
+    update_color = _update_color
+
     def _draw(self, surface):
         for shape in self.drawable_shapes:
             # print('shape width: {} type: {}'.format(shape['width'], type(shape['width'])))
@@ -84,6 +96,24 @@ class PygameObj:
                 pygame_draw.rect(surface, color, shape['rect'], shape['width'])
             elif shape['type'] == 'circle':
                 pygame_draw.circle(surface, color, shape['center'], shape['radius'], shape['width'])
+        if self.text_render is not None:
+            surface.blit(self.text_render, self.text_rect)
+
+    draw = _draw
+
+    def update_text(self, text=None, font=None):
+        assert self.text is not None and text is not None, \
+            'Cannot show text with no text passed as argument and no text in object!'
+        assert self.font is not None and font is not None, \
+            'Cannot create text with no font passed as argument and no font in object!'
+        if text is not None:
+            self.text = text
+        if font is not None:
+            self.text_render = font.render(text, True, (255, 255, 255))
+        else:
+            self.text_render = self.font.render(self.text, True, (255, 255, 255))
+        self.text_rect = self.text_render.get_rect()
+        self.text_rect.center = self.center
 
     def set_center(self, new_center):
         self.center = [new_center[0], new_center[1]]
@@ -96,7 +126,7 @@ class PygameObj:
 
     def in_hit_box(self, pos):
         if pos[0] in range(self.hit_box[0][0], self.hit_box[0][1]) and \
-            pos[1] in range(self.hit_box[1][0], self.hit_box[1][1]):
+                pos[1] in range(self.hit_box[1][0], self.hit_box[1][1]):
             return True
         else:
             return False

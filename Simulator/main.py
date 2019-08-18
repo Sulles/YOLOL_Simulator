@@ -83,18 +83,20 @@ def simulator():
                     if not option_screen.is_active:
                         selected_obj = network.get_closest_obj(event.pos)
                         print('Got closest obj with name: "%s"' % selected_obj.name)
-                elif event.button == 1: # left click
+                elif event.button == 1:     # left click
                     if option_screen.is_active:
-                        option_screen.handle_action('MOUSE_DOWN', event.pos)
+                        do_terminate = option_screen.handle_action('MOUSE_DOWN', event.pos)
+                        if do_terminate:
+                            terminate()
                     else:
                         print('Left click found: {}'.format(event.pos))
                         network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
             elif event.type == MOUSEBUTTONUP:
-                if event.button == 3:   # right click
-                    if not option_screen.is_active:
-                        print('Right mouse up found?')
-                        selected_obj = None
+                # if event.button == 3:   # right click
+                #     if not option_screen.is_active:
+                #         print('Right mouse up found?')
+                #         selected_obj = None
                 if event.button == 1:   # left click
                     if not option_screen.is_active:
                         network.handle_action(event.pos, action_type='LEFT_MOUSE_UP')
