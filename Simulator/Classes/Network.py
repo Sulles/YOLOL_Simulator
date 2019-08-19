@@ -2,7 +2,7 @@
 Created: July 13, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This class hosts all the objects within a network
@@ -10,6 +10,7 @@ This class hosts all the objects within a network
 
 from .map import *
 from math import sqrt
+from copy import copy
 
 
 class Network:
@@ -72,4 +73,4 @@ class Network:
             obj.draw(surface)
 
     def get_objects(self):
-        return [_ for _ in self.objects]
+        return [copy(_) for _ in self.objects]

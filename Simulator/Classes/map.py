@@ -2,7 +2,7 @@
 Created: July 13, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This file houses the map of expected functions for each device/machine
@@ -18,7 +18,6 @@ from .Chip import Chip
 from .Lamp import Lamp
 
 obj_map = {
-    'Button': Button,
     'Button0': Button0,
     'Chip': Chip,
     'Lamp': Lamp

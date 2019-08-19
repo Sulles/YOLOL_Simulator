@@ -1,7 +1,7 @@
 """
 Created August 13, 2019
 
-Author: StolenLight
+Author: Sulles
 
 This file houses the Options Screen class and is a part of the GUI for the simulator
 
@@ -18,10 +18,27 @@ Available options:
         B. Change FPS (default 60)
 """
 
-import pygame
-from Classes.pygame_obj import PygameObj
-from pygame import font
+# noinspection PyUnresolvedReferences
+from Classes import Button, Chip, Lamp, map, Network, pygame_obj
+from pygame import font, draw as pygame_draw
 from math import sqrt
+
+
+class ErrorObj(pygame_obj.PygameObj):
+    def __init__(self, text, screen_size):
+        center = [int(screen_size['width'] / 2), int(screen_size['height'] / 2)]
+        pygame_obj.PygameObj.__init__(self, center,
+                                      0, 0, [(200, 0, 0)], [
+                                          {'type': 'rect',
+                                           'color': None,
+                                           'settings': {
+                                               'center': [0, 0],
+                                               'width': 500,
+                                               'height': 500
+                                           }}
+                                      ],
+                                      text=text,
+                                      Font=font.Font('src/Cubellan.ttf', 20))
 
 
 class ListObj:
@@ -60,11 +77,11 @@ class ListObj:
                      'height': 40}})
 
             self.objects.append(
-                PygameObj([int(screen_size['width'] / 2) + 100,
-                           int(100 + (70 * x))],
-                          200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes, text=list_of_entries[x],
-                          Font=self.font))
-        print('List objects: {}'.format(self.objects))
+                pygame_obj.PygameObj([int(screen_size['width'] / 2) + 100,
+                                      int(100 + (70 * x))],
+                                     200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes,
+                                     text=list_of_entries[x],
+                                     Font=self.font))
 
     def draw(self, surface):
         for obj in self.objects:
@@ -97,7 +114,7 @@ class OptionScreen:
 
         # Simple dictionary of all settings, with key as first layer text, and value as sub-layer text
         self.options_text = {
-            'Edit networks': ['Add/remove objects from a network', 'Create a new network',
+            'Edit networks': ['Create a new network', 'Add/remove objects from a network',
                               'Modify an existing network', 'Delete a network'],
             'Edit YOLOL code': [],
             'Edit simulator settings': ['Change screen size', 'Change FPS'],
@@ -110,18 +127,29 @@ class OptionScreen:
         # TODO: make sure yolol_list can be updated appropriately, will probably need to create a new obj for each
         #  new chip created
         self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size)
-
         self.selected_key = None
-
         self.current_list_obj = []
         self.update_current_list()
 
-    def update_current_list(self):
-        if isinstance(self.selected_key, int) and self.current_list_obj == self.main_list:
-            main_key_map = [_ for _ in self.options_text.keys()]
-            self.selected_key = main_key_map[self.selected_key]
-            print('Mapped key to: "%s"' % self.selected_key)
+        self.error = None
+        self.error_screens = dict()
+        self.error_screens['incomplete_feature'] = ErrorObj('Incomplete Feature!', screen_size)
 
+    def update_current_list(self):
+        if isinstance(self.selected_key, int):
+            key_map = []
+            if self.current_list_obj == self.main_list:
+                key_map = [str(_) for _ in self.options_text.keys()]
+            elif self.current_list_obj == self.network_list:
+                key_map = [str(_) for _ in self.options_text['Edit networks']]
+            # elif self.current_list_obj == self.yolol_list:
+            #     key_map =
+            elif self.current_list_obj == self.simulator_list:
+                key_map = [str(_) for _ in self.options_text['Edit simulator settings']]
+            # print('Mapped key to: "%s"' % self.selected_key)
+            self.selected_key = key_map[self.selected_key]
+
+        # MAIN LIST OPTIONS
         if self.selected_key is None:
             self.current_list_obj = self.main_list
         elif self.selected_key == 'Edit networks':
@@ -136,11 +164,17 @@ class OptionScreen:
         elif self.selected_key == 'Edit simulator settings':
             self.current_list_obj = self.simulator_list
         elif self.selected_key == 'Exit':
-            # returns do_terminate = True to main
-            return True
+            return dict(type='terminate')
+
+        # EDIT NETWORK OPTIONS
+        elif self.selected_key == 'Create a new network':
+            print('You want to create a new network! Cool!')
+            return dict(type='add network')
+
         else:
             print('what even is the selected key?: {}'.format(self.selected_key))
-            raise AttributeError
+            # TODO: change this error type when all features have been implemented
+            self.error = 'incomplete_feature'
 
         if self.current_list_obj is None:
             print('Nothing to display, returning to main menu...')
@@ -151,6 +185,7 @@ class OptionScreen:
             self.deactivate()
         else:
             self.activate()
+        self.error = False
 
     def activate(self):
         self.is_active = True
@@ -159,7 +194,10 @@ class OptionScreen:
         self.is_active = False
 
     def draw(self, surface):
-        self.current_list_obj.draw(surface)
+        if self.error:
+            self.error_screens[self.error].draw(surface)
+        else:
+            self.current_list_obj.draw(surface)
 
     def handle_action(self, action_type, mouse_pos=None):
         if action_type == 'ESCAPE' and self.selected_key is not None:
@@ -175,3 +213,7 @@ class OptionScreen:
         else:
             print('Unsupported action detected! Got: {}'.format(action_type))
             raise AttributeError
+
+    def show_incomplete_feature(self):
+        self.is_active = True
+        self.error = 'incomplete_feature'

@@ -2,7 +2,7 @@
 Created: July 13, 2019
 Last Updated:
 
-Author: StolenLight
+Author: Sulles
 
 TODO: Make _chip dynamically create line functions with:
     https://stackoverflow.com/questions/3687682/python-define-dynamic-functions?lq=1

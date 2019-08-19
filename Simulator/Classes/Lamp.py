@@ -2,7 +2,7 @@
 Created: July 13, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This class simulates the funtionality of a Lamp in Starbase.
@@ -25,20 +25,13 @@ class Lamp(PygameObj):
         """
         settings = {'name': 0, 'on': False, 'lumens': 600, 'hue': 360, 'saturation': 0, 'value': 200, 'range': 10,
                     'center': [0, 0], 'width': 30, 'height': 30,
-                    'color_map': [(0, 0, 0), colorsys.hsv_to_rgb(360, 0, 200)],
+                    'color_map': [None, colorsys.hsv_to_rgb(360, 0, 200)],
                     'shapes': [
                         {'type': 'circle',
                          'color': None,
                          'settings':
                              {'center': [0, 0],
                               'radius': 50}},
-                        {'type': 'rect',
-                         'color': (0, 0, 0),
-                         'width': 2,
-                         'settings':
-                             {'center': [0, 0],
-                              'width': 30,
-                              'height': 30}},
                         {'type': 'circle',
                          'color': (225, 225, 0),
                          'settings':

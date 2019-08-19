@@ -2,7 +2,7 @@
 Created: July 14, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This is the main simulator code. From here, users can
@@ -20,7 +20,7 @@ from pygame.locals import *
 # noinspection PyUnresolvedReferences
 from src.constants import colors
 # noinspection PyUnresolvedReferences
-from src.GUI import GUI
+from GUI import GUI
 # noinspection PyUnresolvedReferences
 from Classes.Network import Network
 # noinspection PyUnresolvedReferences
@@ -41,16 +41,20 @@ def simulator():
     option_screen = OptionScreen(DISPLAY)
 
     # Initialize Network here
-    network_settings = {'Button0':
+    selected_network = 0
+    all_networks = []
+    network_settings = {'Lamp':
+                            {'name': 'lamp_name',
+                             'state': 1,
+                             'center': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]},
+                        'Button0':
                             {'name': 'butt_name',
                              'state': 0,
                              'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
-                             'color_map': [colors['RED'], colors['GREEN']]},
-                        'Lamp':
-                            {'name': 'lamp_name',
-                             'state': 1,
-                             'center': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]}}
-    network = Network('test_network', network_settings)
+                             'color_map': [colors['RED'], colors['GREEN']]}
+                        }
+    all_networks.append(Network('test_network', network_settings))
+    gui.add_network('test network', all_networks[0])
 
     print("Initialization complete, running playground...")
 
@@ -62,44 +66,51 @@ def simulator():
             # EXIT CONDITION
             if event.type == QUIT:
                 terminate()
+
+            # KEY INPUT CONDITION
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     # Show main screen
                     option_screen.handle_action('ESCAPE')
 
-                # OBJECT SELECTION
-                # elif selected_eid:
-                #     if event.key == K_r:
-                #         print("Mark receivers")
-                #         engine.mark_receiver(selected_eid, True)
-                #     elif event.key == K_BACKSPACE:
-                #         engine.remove_body(selected_eid)
-                #         selected_eid = None
-
+            # MOUSE BUTTON DOWN
             elif event.type == MOUSEBUTTONDOWN:
-                # pprint(vars(event))
-                if event.button == 3:   # right click
+                # RIGHT CLICK
+                if event.button == 3:
                     print('Right click found: {}'.format(event.pos))
                     if not option_screen.is_active:
-                        selected_obj = network.get_closest_obj(event.pos)
+                        selected_obj = all_networks[selected_network].get_closest_obj(event.pos)
                         print('Got closest obj with name: "%s"' % selected_obj.name)
-                elif event.button == 1:     # left click
+                # LEFT CLICK
+                elif event.button == 1:
                     if option_screen.is_active:
-                        do_terminate = option_screen.handle_action('MOUSE_DOWN', event.pos)
-                        if do_terminate:
-                            terminate()
+                        response = option_screen.handle_action('MOUSE_DOWN', event.pos)
+                        if response is not None:
+                            if response['type'] == 'terminate':
+                                terminate()
+                            elif response['type'] == 'add network':
+                                # TODO Handle passing new network information from OptionScreen to all_networks here!
+                                #  Maybe to the instantiation of the network in main as well?
+                                # all_networks.append(create_new_network())
+                                option_screen.show_incomplete_feature()
+                            else:
+                                option_screen.show_incomplete_feature()
                     else:
                         print('Left click found: {}'.format(event.pos))
-                        network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
+                        for network in all_networks:
+                            network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
+            # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
-                # if event.button == 3:   # right click
-                #     if not option_screen.is_active:
-                #         print('Right mouse up found?')
-                #         selected_obj = None
-                if event.button == 1:   # left click
+                # RIGHT CLICK
+                if event.button == 3:
                     if not option_screen.is_active:
-                        network.handle_action(event.pos, action_type='LEFT_MOUSE_UP')
+                        print('Right mouse up found?')
+                        selected_obj = None
+                # LEFT CLICK
+                if event.button == 1:
+                    if not option_screen.is_active:
+                        all_networks[selected_network].handle_action(event.pos, action_type='LEFT_MOUSE_UP')
 
         if selected_obj:
             selected_obj.set_center(pygame.mouse.get_pos())
@@ -114,7 +125,8 @@ def simulator():
             option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             option_screen.draw(surface)
         else:
-            network.draw(surface)
+            for network in all_networks:
+                network.draw(surface)
             gui.draw(surface)
 
         pygame.display.update()

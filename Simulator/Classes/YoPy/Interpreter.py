@@ -1,7 +1,7 @@
 """
 Created July 31, 2019
 
-Author: StolenLight
+Author: Sulles
 """
 
 import json

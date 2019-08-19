@@ -2,7 +2,7 @@
 Created: July 13, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This class simulates the functionality of a Button in Starbase. As there are

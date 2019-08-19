@@ -2,7 +2,7 @@
 Created: August 3, 2019
 Last Updated: August 3, 2019
 
-Author: StolenLight
+Author: Sulles
 
 === DESCRIPTION ===
 This class houses all the drawing components required for pygame
@@ -50,14 +50,13 @@ class PygameObj:
         else:
             self.text_render = None
 
+        # Define all shapes as dictionaries. Each shape 'type' has different fields, i.e. a shape type of 'circle' has
+        #   radius, whereas a shape type of 'rect' has width and height
         self.drawable_shapes = []
         for shape_def in shapes:
             # print('Got new shape definition!: {}'.format(shape_def))
-
             if 'width' not in shape_def or shape_def['width'] is None:
                 shape_def['width'] = 0
-            if 'border' not in shape_def or shape_def['border'] is None:
-                shape_def['border'] = 0
 
         self.update_shapes()
 
@@ -67,16 +66,20 @@ class PygameObj:
 
         # re-create shapes
         for shape in self.shape_def:
-            if shape['type'].lower() == 'rect':
+            if shape['type'] == 'rect':
                 self.drawable_shapes.append(
                     dict(type='rect', color=shape['color'], rect=self.create_rect(shape['settings']),
                          width=shape['width']))
-            elif shape['type'].lower() == 'circle':
+            elif shape['type'] == 'circle':
                 center = [self.center[0] + int(shape['settings']['center'][0] / 2),
                           self.center[1] + int(shape['settings']['center'][1] / 2)]
                 self.drawable_shapes.append(
                     dict(type='circle', color=shape['color'], radius=int(shape['settings']['radius']),
                          center=center, width=shape['width']))
+            elif shape['type'] == 'point_list':
+                self.drawable_shapes.append(
+                    dict(type='shape', color=shape['color'], point_list=[_ for _ in shape['point_list']],
+                         width=shape['width']))
 
     def _update_color(self, map_index):
         self.color = self.color_map[map_index]
@@ -87,15 +90,20 @@ class PygameObj:
     def _draw(self, surface):
         for shape in self.drawable_shapes:
             # print('shape width: {} type: {}'.format(shape['width'], type(shape['width'])))
+            # Get variable colors
             if shape['color'] is None:
                 color = self.color
             else:
                 color = shape['color']
 
-            if shape['type'] == 'rect':
-                pygame_draw.rect(surface, color, shape['rect'], shape['width'])
-            elif shape['type'] == 'circle':
-                pygame_draw.circle(surface, color, shape['center'], shape['radius'], shape['width'])
+            # Don't draw shape if color is None
+            if color is not None:
+                if shape['type'] == 'rect':
+                    pygame_draw.rect(surface, color, shape['rect'], shape['width'])
+                elif shape['type'] == 'circle':
+                    pygame_draw.circle(surface, color, shape['center'], shape['radius'], shape['width'])
+                elif shape['type'] == 'point_list':
+                    pygame_draw.lines(surface, color, True, shape['point_list'], shape['width'])
         if self.text_render is not None:
             surface.blit(self.text_render, self.text_rect)
 
