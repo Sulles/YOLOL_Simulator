@@ -1,5 +1,7 @@
 # YOLOL Simulator
-This project strives to simulate the interaction between YOLOL code and all objects within its network
+This project strives to simulate the interaction between YOLOL code and all objects within its network. Please note that this project is still a work-in-progress and is not ready for 0.1 Release as of now. 0.1 Release will cover all the foundational code such that progress made for 1.0 should be as simple as adding more objects and touching up the GUIs. This means that all the hard work will need to be done before 0.1 and may take longer than expected.
+
+Please see 'Current Work In Progress' to see what is being worked on, as well as to get a gauge of how much work is left to be done before the next release.
 
 #### Controls:
 - Left-click sends 'action' to object (on button down, and on button up supported)
@@ -15,9 +17,9 @@ This project strives to simulate the interaction between YOLOL code and all obje
 ### CYLON AST To Python Converter v0.1 (100% complete)
 Could use better unit tests, see Known Issues below, needs to be fixed
 
-## Current Work In Progress (Planned for 0.1 Release) 90% Complete
+## Current Work In Progress (Planned for 0.1 Release) 93% Complete
 
-### GUI (15% complete of 25%)
+### GUI (30% complete of 40%)
 It will be possible to create custom 'textures' for all components. Need to implement this with setup.
 GUI needs to show all objects in a network as well as their states
 Need to create instructions screen page
@@ -27,9 +29,9 @@ Need to link YOLOL external variables to objects in the network and allow user t
 
 ### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
 
-### Create UI to create Network with specific components (5% complete of 25%)
+### Create UI to create Network with specific components (15% complete of 25%)
 
-### Create GUI for YOLOL Chip interaction (0% complete of 10%)
+### Create GUI for YOLOL Chip interaction (10% complete of 20%)
 
 ### Python Emulator Object Classes and Network (9% complete of 9.4%)
 #### Planned devices for 0.1 Release 
