@@ -4,3 +4,5 @@ if var==0 then if endRes!=1 then endRes=2 end else endRes=1 end A =:b goto 1
 if var==0 then endRes=1 else if var==1 then endRes=2 end end
 
 a = 1 b = a + 1 c = b * b if a == 1 then d = 1 else d = 0 end
+
+

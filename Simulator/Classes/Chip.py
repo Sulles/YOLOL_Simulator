@@ -18,8 +18,8 @@ for root, dirs, files in os.walk("/mydir"):
              print(os.path.join(root, file))
 """
 import os
-import threading
-from time import sleep, time
+from copy import copy
+from time import time
 
 if __name__ == "__main__":
     # noinspection PyUnresolvedReferences
@@ -43,7 +43,7 @@ class _chip(PygameObj):
         :param style: Chip style, some chips will be capable of running more complex calculations than others
         :param center: The center pixel of the chip
         """
-        assert os.path.exists('YoPy/{}.txt'.format(name)), 'Could not find: "Classes/YoPy/%s.txt"' % name
+        assert os.path.exists('Classes/YoPy/{}.txt'.format(name)), 'Could not find: "Classes/YoPy/%s.txt"' % name
 
         self.name = name
         self.chipwait = wait
@@ -58,8 +58,8 @@ class _chip(PygameObj):
         PygameObj.__init__(self, center, width, height, color_map, shapes)
 
         try:
-            CylonAST = open('YoPy/{}.txt'.format(name), 'r')
-            YoPy = open('YoPy/YoPy_{}.py'.format(name), 'w+')
+            CylonAST = open('Classes/YoPy/{}.txt'.format(name), 'r')
+            YoPy = open('Classes/YoPy/YoPy_{}.py'.format(name), 'w+')
             print('Found: {}.txt'.format(name))
         except Exception:
             print('Ruh roh! Could not read/write either YoPy/{0}.txt or YoPy/YoPy_{0}.py !'.format(name))
@@ -129,20 +129,20 @@ class _chip(PygameObj):
     def _run_next_line(self):
         if not self.run_line:
             print('ERROR: Chip disabled!')
-            return False
+            return None
         elif time() - self.last_run >= 0.2:
             self.last_run = time()
             print('Starting to execute line %d' % self.current_line)
             if self.lines[self.current_line - 1] is not None:
                 self.kwargs, goto = self.lines[self.current_line - 1](self.kwargs)
-                # print('(=) Updated kwargs: {}'.format(self.kwargs))
+                # print('Chip Updated kwargs: {}'.format(self.kwargs))
                 if goto:
                     # print('Got goto: %d' % goto)
                     self.current_line = goto
-            return True
+            return copy(self.kwargs)
         else:
             print('ERROR: Tried to run next line too soon!')
-            return False
+            return None
 
     def _handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN':
@@ -189,19 +189,5 @@ class Chip(_chip):
     def disable(self):
         self.run_line = False
 
-
-# Unit test
-if __name__ == "__main__":
-    print("Running unit test for Chip class...")
-    chip = Chip({'name': "test_chip"})
-    chip.print()
-    print('testing calling lines...')
-    if not chip.step():
-        print('Correctly failed')
-    sleep(0.2)
-    if chip.step():
-        print('Correctly passed')
-    chip.disable()
-    sleep(0.2)
-    if not chip.step():
-        print('Correctly failed')
+    def handle_action(self, action_type):
+        return self._handle_action(action_type)

@@ -42,7 +42,7 @@ def handle_lines(YoPy):
     """
     YoPy.seek(0, 0)
     line_number = 1
-    output = "from time import sleep"
+    output = ""
     for line in YoPy.readlines():
         if re.search(r'# NEW LINE!', line):
             output += '\n# END INDENT'
@@ -182,7 +182,7 @@ def parse(line, YoPy):
     :param line: JSON structure of the line to parse
     :return: N/A
     """
-    YoPy.write('\n\n# NEW LINE!\n')
+    YoPy.write('\n# NEW LINE!\n')
     # print('NEW LINE!')
     if len(line['comment']) > 0:
         YoPy.write('\n# {}'.format(line['comment']))

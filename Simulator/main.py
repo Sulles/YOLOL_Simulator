@@ -26,6 +26,9 @@ from Classes.Network import Network
 # noinspection PyUnresolvedReferences
 from OptionScreen import OptionScreen
 
+sys.path.append('Classes')
+os.path.join('Classes')
+
 
 def simulator():
     pygame.init()
@@ -51,10 +54,14 @@ def simulator():
                             {'name': 'butt_name',
                              'state': 0,
                              'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
-                             'color_map': [colors['RED'], colors['GREEN']]}
+                             'color_map': [colors['RED'], colors['GREEN']]},
+                        'Chip':
+                            {'name': 'test_chip',
+                             'center': [200, 200]}
                         }
     all_networks.append(Network('test_network', network_settings))
-    gui.add_network('test network', all_networks[0])
+    # TODO: add another network to gui and verify network tabs work as expected
+    gui.add_network('test network', [network for network in all_networks])
 
     print("Initialization complete, running playground...")
 
@@ -112,10 +119,13 @@ def simulator():
                     if not option_screen.is_active:
                         all_networks[selected_network].handle_action(event.pos, action_type='LEFT_MOUSE_UP')
 
+        # Follow mouse
         if selected_obj:
             selected_obj.set_center(pygame.mouse.get_pos())
 
-        # Perform tick update here for YOLOL chips
+        # Perform tick update here all networks
+        for network in all_networks:
+            network.step()
 
         # Re-draw background
         surface.fill(colors['BGCOLOR'])

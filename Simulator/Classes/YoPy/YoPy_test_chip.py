@@ -1,14 +1,8 @@
-from time import sleep
 
 
 
 def line_1(kwargs):  
-    if kwargs['var'] == 0:  
-        if kwargs['endres'] != 1:  
-            kwargs['endres'] = 2    
-    
-    else: 	
-        kwargs['endres'] = 1  
-    kwargs['a'] = kwargs['GLOBAL_b']
-    return kwargs, 1
+    if kwargs['GLOBAL_buttonstate'] == kwargs['GLOBAL_buttononstate']:  
+        kwargs['GLOBAL_lampon'] = 1  
+    return kwargs, None
     

@@ -8,9 +8,10 @@ Author: Sulles
 This class hosts all the objects within a network
 """
 
-from .map import *
-from math import sqrt
 from copy import copy
+from math import sqrt
+from time import time
+from .map import *
 
 
 class Network:
@@ -26,8 +27,10 @@ class Network:
         self.name = name
         self.update_flag = False
         self.objects = []
-        for ob_set in obj_settings.keys():
-            self.objects.append(obj_map[ob_set](obj_settings[ob_set]))
+        self.last_step_time = time()
+
+        for obj_set in obj_settings.keys():
+            self.objects.append(obj_map[obj_set](obj_settings[obj_set]))
 
         for obj in self.objects:
             print('Created new object: "%s" with hitbox: %s' % (obj.name, obj.hit_box))
@@ -74,3 +77,26 @@ class Network:
 
     def get_objects(self):
         return [copy(_) for _ in self.objects]
+
+    def step(self):
+        """
+        This function is for handling chip steps if a chip is in a network
+        """
+        attr_updates = None
+        ms_time_dif = int(1000 * (time() - self.last_step_time))
+        if ms_time_dif > 200:
+            self.last_step_time = time()
+            for obj in self.objects:
+                if isinstance(obj, Chip):
+                    attr_updates = obj.step()
+
+        if attr_updates is not None:
+            print('Got chip update! "{}"'.format(attr_updates))
+            print('parsing answer...')
+            for var in attr_updates.keys():
+                if 'GLOBAL' in var:
+                    attr_name = var[7:]
+                    print('finding object with attribute: "%s"' % attr_name)
+                    for obj in self.objects:
+                        if hasattr(obj, attr_name):
+                            print('Is this what you are looking for?: "%s"' % obj.name)
