@@ -15,6 +15,7 @@ if __name__ == "__main__":
 else:
     from .pygame_obj import PygameObj
 import colorsys
+from copy import copy
 
 
 class Lamp(PygameObj):
@@ -59,13 +60,22 @@ class Lamp(PygameObj):
             self.lampcolorvalue = self.lamprange = None
         self.enable_disable()
 
-    def toggle_on_off(self):
-        if self.lampon:
-            self.lampon = False
-        else:
-            self.lampon = True
+        self.attribute_map = dict(lampon='lampon')
+
+    def toggle_on_off(self, on_off=None):
+        if on_off is not None:  # if specified ON/OFF state
+            if on_off:  # True is ON, False is OFF
+                self.lampon = True
+            else:
+                self.lampon = False
+        else:   # Toggle
+            if self.lampon:
+                self.lampon = False
+            else:
+                self.lampon = True
         print('Lamp "%s" new state is: %d' % (self.name, self.lampon))
         self.enable_disable()
+        return dict(lampon=copy(self.lampon))
 
     def print(self):
         print("=== LAMP INFORMATION ===\n"
@@ -92,7 +102,20 @@ class Lamp(PygameObj):
 
     def handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN':
-            self.toggle_on_off()
+            return self.toggle_on_off()
+
+    def get_attributes(self):
+        return copy(self.attribute_map.keys())
+
+    def change_attr_name(self, old_name, new_name):
+        # TODO: DO THIS NEXT
+        pass
+
+    def modify_attr(self, attr, new_value):
+        if self.attribute_map[attr] == 'lampon':
+            self.toggle_on_off(new_value)
+        else:
+            print('This attribute is either not supported or cannot be modified by YOLOL code!')
 
 
 # Unit test

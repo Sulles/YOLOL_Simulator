@@ -53,6 +53,7 @@ class _chip(PygameObj):
         self.lines = list()
         self.total_lines = 0
         self.current_line = 1
+        self.attribute_map = ['chipwait']
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -132,10 +133,11 @@ class _chip(PygameObj):
             return None
         elif time() - self.last_run >= 0.2:
             self.last_run = time()
-            print('Starting to execute line %d' % self.current_line)
+            # TODO: if only 1 line in AST, make sure lines 2-20 are also 'executed'
+            # print('Starting to execute line %d' % self.current_line)
             if self.lines[self.current_line - 1] is not None:
                 self.kwargs, goto = self.lines[self.current_line - 1](self.kwargs)
-                # print('Chip Updated kwargs: {}'.format(self.kwargs))
+                print('Chip Updated kwargs: {}'.format(self.kwargs))
                 if goto:
                     # print('Got goto: %d' % goto)
                     self.current_line = goto
@@ -147,6 +149,7 @@ class _chip(PygameObj):
     def _handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN':
             print('self.run_thread?: {}'.format(self.run_line))
+            self.update_color(self.run_line)
             if not self.run_line:
                 self.run_line = True
                 print('Got command to start next line!')
@@ -155,13 +158,26 @@ class _chip(PygameObj):
                 print('Cancelling %s execution...' % self.name)
                 self.run_line = False
 
+    def _update_kwargs(self, updated_kwargs):
+        for key, item in updated_kwargs.items():
+            if key in self.kwargs:
+                print('Updating "{0}" from {1} to {2}'.format(key, self.kwargs[key], item))
+                self.kwargs[key] = item
+
+    def get_attributes(self):
+        return copy(self.attribute_map)
+
+    def modify_attr(self):
+        # TODO: do this... at some point XD
+        print('Not supported at this time!')
+
 
 # This is the main chip class
 # TODO: Add chip-specific functionality and verify code compatibility for each chip type
 class Chip(_chip):
     def __init__(self, input_settings):
         settings = {'name': "", 'wait': 0, 'style': 0, 'center': [0, 0], 'width': 50, 'height': 40,
-                    'color_map': [(100, 100, 100), (100, 150, 100)],
+                    'color_map': [(100, 200, 100), (200, 100, 100)],
                     'shapes': [
                         {'type': 'rect',
                          'color': None,
@@ -191,3 +207,6 @@ class Chip(_chip):
 
     def handle_action(self, action_type):
         return self._handle_action(action_type)
+
+    def update_kwargs(self, updated_kwargs):
+        self._update_kwargs(updated_kwargs)

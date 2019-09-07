@@ -49,10 +49,20 @@ class Network:
         :param action_location: A list of x, y coords where user action occurred
         :param action_type: The type of action that the user requested
         """
+        response = None
         for obj in self.objects:
             if action_location[0] in range(obj.hit_box[0][0], obj.hit_box[0][1]) and \
                     action_location[1] in range(obj.hit_box[1][0], obj.hit_box[1][1]):
-                obj.handle_action(action_type)
+                response = obj.handle_action(action_type)
+        if response is not None:
+            print('Got response from action: {}'.format(response))
+            parsed_response = dict()
+            for key, item in response.items():
+                parsed_response[str('GLOBAL_' + key)] = item
+            for obj in self.objects:
+                if isinstance(obj, Chip):
+                    print('Updating chip "{0}" with data: {1}'.format(obj.name, parsed_response))
+                    obj.update_kwargs(parsed_response)
 
     def get_closest_obj(self, action_location):
         distance = []
@@ -91,12 +101,12 @@ class Network:
                     attr_updates = obj.step()
 
         if attr_updates is not None:
-            print('Got chip update! "{}"'.format(attr_updates))
-            print('parsing answer...')
-            for var in attr_updates.keys():
-                if 'GLOBAL' in var:
-                    attr_name = var[7:]
-                    print('finding object with attribute: "%s"' % attr_name)
+            for key, value in attr_updates.items():
+                if 'GLOBAL' in key:
+                    attr_name = key[7:]
+                    # print('finding object with attribute: "%s"' % attr_name)
                     for obj in self.objects:
-                        if hasattr(obj, attr_name):
-                            print('Is this what you are looking for?: "%s"' % obj.name)
+                        if attr_name in obj.get_attributes():
+                            print('Updating "{0}" attribute "{1}" to value: {2}'.format(
+                                obj.name, attr_name, value))
+                            obj.modify_attr(attr_name, value)

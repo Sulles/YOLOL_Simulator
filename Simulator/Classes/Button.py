@@ -16,6 +16,7 @@ if __name__ == "__main__":
     from pygame_obj import PygameObj
 else:
     from .pygame_obj import PygameObj
+from copy import copy
 
 
 # This is the sub-class
@@ -40,6 +41,8 @@ class _button(PygameObj):
         self.buttonoffstate = off_state
         self.buttonstyle = style
         self.maxstate = 0
+        # TODO: verify that these attributes are modifiable by YOLOL code!
+        self.attribute_map = ['buttononstate', 'buttonoffstate']
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -58,7 +61,7 @@ class _button(PygameObj):
             self.maxstate = 5
 
     def increment_state(self):
-        self.update_state((self.buttonstate + 1) % self.maxstate)
+        return self.update_state((self.buttonstate + 1) % self.maxstate)
 
     def update_state(self, new_state):
         print('Button "{0}" updated state from {1} to {2}'.format(
@@ -66,6 +69,14 @@ class _button(PygameObj):
         self.buttonstate = new_state
         self.run_assert()
         self._update_color(self.buttonstate)
+        return dict(buttonstate=copy(self.buttonstate))
+
+    def get_attributes(self):
+        return copy(self.attribute_map)
+
+    def modify_attr(self):
+        # TODO: do this... at some point XD
+        print('Not supported at this time!')
 
     def _print(self):
         print("=== BUTTON INFORMATION ===\n"
@@ -107,8 +118,8 @@ class Button(_button):
                                  settings['color_map'], settings['shapes'])
 
     def _handle_action(self, action_type):
-        if action_type == 'LEFT_MOUSE_DOWN':
-            self.increment_state()
+        if action_type == 'LEFT_MOUSE_DOWN' or action_type == 'LEFT_MOUSE_UP':
+            return self.increment_state()
 
     # MISC
     def print(self):
@@ -132,10 +143,7 @@ class Button0(Button):
         Button.__init__(self, input_settings)
 
     def handle_action(self, action_type):
-        if action_type == 'LEFT_MOUSE_DOWN':
-            self.increment_state()
-        if action_type == 'LEFT_MOUSE_UP':
-            self.increment_state()
+        return self._handle_action(action_type)
 
     def draw(self, surface):
         self._draw(surface)
