@@ -37,12 +37,15 @@ class _button(PygameObj):
         # Button parameters
         self.name = name
         self.buttonstate = state
+        # Internal state is what transitions button from onstate to offstate depending on interaction
+        self.internal_state = True
         self.buttononstate = on_state
         self.buttonoffstate = off_state
         self.buttonstyle = style
         self.maxstate = 0
         # TODO: verify that these attributes are modifiable by YOLOL code!
-        self.attribute_map = dict(buttononstate='buttononstate', buttonoffstate='buttonoffstate')
+        self.attribute_map = dict(buttonstate='buttonstate', buttononstate='buttononstate',
+                                  buttonoffstate='buttonoffstate')
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -61,11 +64,11 @@ class _button(PygameObj):
             self.maxstate = 5
 
     def increment_state(self):
-        return self.update_state((self.buttonstate + 1) % self.maxstate)
+        self.internal_state = (self.internal_state + 1) % self.maxstate
+        return self.update_state(self.internal_state)
 
     def update_state(self, new_state):
-        print('Button "{0}" updated state from {1} to {2}'.format(
-            self.name, self.buttonstate, new_state))
+        print('"{0}" buttonstate updated from {1} to {2}'.format(self.name, self.buttonstate, new_state))
         self.buttonstate = new_state
         self.run_assert()
         self._update_color(self.buttonstate)
@@ -81,7 +84,7 @@ class _button(PygameObj):
         :param new_value: new value for the corresponding attribute
         """
         # TODO: do this... at some point XD
-        print('Not supported at this time!')
+        print('"%s" does not support modifying "%s" at this time!' % (self.name, str(attr)))
 
     def change_attr_name(self, old_name, new_name):
         """
