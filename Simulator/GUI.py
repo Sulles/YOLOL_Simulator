@@ -11,6 +11,10 @@ This class houses the GUI
 from src.constants import colors
 # noinspection PyUnresolvedReferences
 from Classes.pygame_obj import PygameObj
+# noinspection PyUnresolvedReferences
+from Classes.map import obj_map
+# noinspection PyUnresolvedReferences
+from OptionScreen import ListObj
 import pygame.font
 import pygame.draw
 from pygame import Rect
@@ -41,6 +45,15 @@ class GUI:
         self.net_info.append(Rect(self.position[0] + 2, self.position[1] + 2, self.width - 4, self.height - 4))
         self.net_info.append(Rect(self.position[0] + 4, self.position[1] + 4, self.width - 8, self.height - 8))
 
+        # CREATING NETWORK STUFF
+        self.creating_network = False
+        self.create_step = 0
+        self.create_steps = ['select_objects', 'modify_attributes', 'instantiate_network']
+        self.possible_objects = ListObj(list(obj_map.keys()), display_settings)
+        self.option_obj_map = dict(select_objects=self.possible_objects)
+        # TODO: add something for modify_attributes and instantiate_network to option_obj_map
+        self.current_list_obj = None
+
     def add_network(self, name, network):
         self.network_names.append(name)
         # def __init__(self, center, width, height, color_map, shapes, text=None, Font=None):
@@ -57,6 +70,14 @@ class GUI:
              'center': center,
              'point_list': [top_left, top_right, bottom_right, bottom_left]}]))
 
+    def create_network(self):
+        self.creating_network = True
+
+    def draw_create_network(self, surface):
+        print('Network creation step: %s' % self.create_steps[self.create_step])
+        if self.create_steps[self.create_step] == 'select_objects':
+            self.possible_objects.draw(surface)
+
     def draw(self, surface, network=None):
         for x in range(len(self.net_info)):
             pygame.draw.rect(surface, self.net_color_map[x], self.net_info[x], self.net_width_map[x])
@@ -65,4 +86,16 @@ class GUI:
         #     pass
         for tab in self.tabs:
             tab.draw(surface)
+
+    def handle_action(self, action_type, mouse_pos=None):
+        if action_type == 'ESCAPE':
+            self.creating_network = False
+        elif action_type == 'MOUSE_HOVER':
+            self.current_list_obj.handle_hover(mouse_pos)
+        elif action_type == 'MOUSE_DOWN':
+            self.selected_key = self.current_list_obj.handle_mouse_down(mouse_pos)
+            return self.update_current_list()
+        else:
+            print('Unsupported action detected! Got: {}'.format(action_type))
+            raise AttributeError
 

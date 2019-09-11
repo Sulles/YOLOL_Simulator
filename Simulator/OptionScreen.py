@@ -114,8 +114,7 @@ class OptionScreen:
 
         # Simple dictionary of all settings, with key as first layer text, and value as sub-layer text
         self.options_text = {
-            'Edit networks': ['Create a new network', 'Add/remove objects from a network',
-                              'Modify an existing network', 'Delete a network'],
+            'Edit networks': ['Create a new network', 'Edit objects in a network', 'Delete a network'],
             'Edit YOLOL code': [],
             'Edit simulator settings': ['Change screen size', 'Change FPS'],
             'Exit': []
@@ -128,7 +127,7 @@ class OptionScreen:
         #  new chip created
         self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size)
         self.selected_key = None
-        self.current_list_obj = []
+        self.current_list_obj = None
         self.update_current_list()
 
         self.error = None
@@ -161,6 +160,7 @@ class OptionScreen:
                 self.selected_key = None
             else:
                 print('what is yolol list right now? "{}"'.format(self.yolol_list))
+                # TODO: self.current_list_obj = ???
         elif self.selected_key == 'Edit simulator settings':
             self.current_list_obj = self.simulator_list
         elif self.selected_key == 'Exit':

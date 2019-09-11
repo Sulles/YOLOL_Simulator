@@ -53,7 +53,7 @@ class _chip(PygameObj):
         self.lines = list()
         self.total_lines = 0
         self.current_line = 1
-        self.attribute_map = ['chipwait']
+        self.attribute_map = dict(chipwait='chipwait')
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -133,6 +133,12 @@ class _chip(PygameObj):
             return None
         elif time() - self.last_run >= 0.2:
             self.last_run = time()
+
+            # handle chip wait
+            if self.chipwait != 0:
+                self.chipwait -= 1
+                print('Chip wait decremented to: %d' % self.chipwait)
+
             # TODO: if only 1 line in AST, make sure lines 2-20 are also 'executed'
             # print('Starting to execute line %d' % self.current_line)
             if self.lines[self.current_line - 1] is not None:
@@ -161,15 +167,39 @@ class _chip(PygameObj):
     def _update_kwargs(self, updated_kwargs):
         for key, item in updated_kwargs.items():
             if key in self.kwargs:
-                print('Updating "{0}" from {1} to {2}'.format(key, self.kwargs[key], item))
+                # print('Updating "{0}" from {1} to {2}'.format(key, self.kwargs[key], item))
                 self.kwargs[key] = item
 
     def get_attributes(self):
-        return copy(self.attribute_map)
+        return self.attribute_map.keys()
 
-    def modify_attr(self):
-        # TODO: do this... at some point XD
-        print('Not supported at this time!')
+    def modify_attr(self, attr, new_value):
+        """
+        Function that allows YOLOL code to modify the attribute or 'global variable' value of an object
+        :param attr: string of attribute/global variable to be changed
+        :param new_value: new value for the corresponding attribute
+        """
+        try:
+            if self.attribute_map[attr] == 'chipwait':
+                self.chipwait = new_value
+        except AttributeError:
+            print('The attribute provided is either not supported or cannot be modified by YOLOL code!')
+
+    def change_attr_name(self, old_name, new_name):
+        """
+        This function allows for players to change the 'global variable' of an object
+        :param old_name: string of name of current 'global variable' to be renamed
+        :param new_name: string of new name for 'global variable'
+        """
+        new_attribute_map = dict()
+        for key, item in self.attribute_map.items():
+            if key == old_name:
+                print('Updating attribute map for: "{0}" to "{1}"'.format(key, new_name))
+                new_attribute_map[new_name] = item
+            else:
+                print('Copying over other attributes...')
+                new_attribute_map[key] = item
+        self.attribute_map = new_attribute_map
 
 
 # This is the main chip class

@@ -68,7 +68,7 @@ class Lamp(PygameObj):
                 self.lampon = True
             else:
                 self.lampon = False
-        else:   # Toggle
+        else:  # Toggle
             if self.lampon:
                 self.lampon = False
             else:
@@ -85,9 +85,10 @@ class Lamp(PygameObj):
               "Current Hue: {3}\n"
               "Current Saturation: {4}\n"
               "Current Value: {5}\n"
-              "Current Range: {6}".format(
-            self.name, self.lampon, self.lamplumens, self.lampcolorhue,
-            self.lampcolorsaturation, self.lampcolorvalue, self.lamprange))
+              "Current Range: {6}\n"
+              "Attribute Map: {7}".format(
+            self.name, self.lampon, self.lamplumens, self.lampcolorhue, self.lampcolorsaturation, self.lampcolorvalue,
+            self.lamprange, self.attribute_map))
 
     def enable_disable(self):
         self.lamplumens = self.lumens_list[self.lampon]
@@ -105,17 +106,35 @@ class Lamp(PygameObj):
             return self.toggle_on_off()
 
     def get_attributes(self):
-        return copy(self.attribute_map.keys())
-
-    def change_attr_name(self, old_name, new_name):
-        # TODO: DO THIS NEXT
-        pass
+        return self.attribute_map.keys()
 
     def modify_attr(self, attr, new_value):
-        if self.attribute_map[attr] == 'lampon':
-            self.toggle_on_off(new_value)
-        else:
-            print('This attribute is either not supported or cannot be modified by YOLOL code!')
+        """
+        Function that allows YOLOL code to modify the attribute or 'global variable' value of an object
+        :param attr: string of attribute/global variable to be changed
+        :param new_value: new value for the corresponding attribute
+        """
+        try:
+            if self.attribute_map[attr] == 'lampon':
+                self.toggle_on_off(new_value)
+        except AttributeError:
+            print('The attribute provided is either not supported or cannot be modified by YOLOL code!')
+
+    def change_attr_name(self, old_name, new_name):
+        """
+        This function allows for players to change the 'global variable' of an object
+        :param old_name: string of name of current 'global variable' to be renamed
+        :param new_name: string of new name for 'global variable'
+        """
+        new_attribute_map = dict()
+        for key, item in self.attribute_map.items():
+            if key == old_name:
+                print('Updating attribute map for: "{0}" to "{1}"'.format(key, new_name))
+                new_attribute_map[new_name] = item
+            else:
+                print('Copying over other attributes...')
+                new_attribute_map[key] = item
+        self.attribute_map = new_attribute_map
 
 
 # Unit test
@@ -125,4 +144,6 @@ if __name__ == "__main__":
                  'center': [0, 0]})
     lamp.print()
     lamp.toggle_on_off()
+    lamp.print()
+    lamp.change_attr_name('lampon', 'lampstate')
     lamp.print()

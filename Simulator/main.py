@@ -85,7 +85,7 @@ def simulator():
                 # RIGHT CLICK
                 if event.button == 3:
                     print('Right click found: {}'.format(event.pos))
-                    if not option_screen.is_active:
+                    if not option_screen.is_active and not gui.creating_network:
                         selected_obj = all_networks[selected_network].get_closest_obj(event.pos)
                         print('Got closest obj with name: "%s"' % selected_obj.name)
                 # LEFT CLICK
@@ -98,11 +98,12 @@ def simulator():
                             elif response['type'] == 'add network':
                                 # TODO Handle passing new network information from OptionScreen to all_networks here!
                                 #  Maybe to the instantiation of the network in main as well?
+                                gui.create_network()
                                 # all_networks.append(create_new_network())
                                 option_screen.show_incomplete_feature()
                             else:
                                 option_screen.show_incomplete_feature()
-                    else:
+                    elif not gui.creating_network:
                         print('Left click found: {}'.format(event.pos))
                         for network in all_networks:
                             network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
@@ -111,31 +112,30 @@ def simulator():
             elif event.type == MOUSEBUTTONUP:
                 # RIGHT CLICK
                 if event.button == 3:
-                    if not option_screen.is_active:
+                    if not option_screen.is_active and not gui.creating_network:
                         print('Right mouse up found?')
                         selected_obj = None
                 # LEFT CLICK
                 if event.button == 1:
-                    if not option_screen.is_active:
+                    if not option_screen.is_active and not gui.creating_network:
                         all_networks[selected_network].handle_action(event.pos, action_type='LEFT_MOUSE_UP')
 
         # Follow mouse
         if selected_obj:
             selected_obj.set_center(pygame.mouse.get_pos())
 
-        # Perform tick update here all networks
-        for network in all_networks:
-            network.step()
-
         # Re-draw background
         surface.fill(colors['BGCOLOR'])
 
         # Drawing objects
-        if option_screen.is_active:
+        if gui.creating_network:
+            gui.draw_create_network(surface)
+        elif option_screen.is_active:
             option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             option_screen.draw(surface)
         else:
             for network in all_networks:
+                network.step()
                 network.draw(surface)
             gui.draw(surface)
 

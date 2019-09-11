@@ -42,7 +42,7 @@ class _button(PygameObj):
         self.buttonstyle = style
         self.maxstate = 0
         # TODO: verify that these attributes are modifiable by YOLOL code!
-        self.attribute_map = ['buttononstate', 'buttonoffstate']
+        self.attribute_map = dict(buttononstate='buttononstate', buttonoffstate='buttonoffstate')
 
         # Pygame object init
         PygameObj.__init__(self, center, width, height, color_map, shapes)
@@ -72,11 +72,32 @@ class _button(PygameObj):
         return dict(buttonstate=copy(self.buttonstate))
 
     def get_attributes(self):
-        return copy(self.attribute_map)
+        return self.attribute_map.keys()
 
-    def modify_attr(self):
+    def modify_attr(self, attr, new_value):
+        """
+        Function that allows YOLOL code to modify the attribute or 'global variable' value of an object
+        :param attr: string of attribute/global variable to be changed
+        :param new_value: new value for the corresponding attribute
+        """
         # TODO: do this... at some point XD
         print('Not supported at this time!')
+
+    def change_attr_name(self, old_name, new_name):
+        """
+        This function allows for players to change the 'global variable' of an object
+        :param old_name: string of name of current 'global variable' to be renamed
+        :param new_name: string of new name for 'global variable'
+        """
+        new_attribute_map = dict()
+        for key, item in self.attribute_map.items():
+            if key == old_name:
+                print('Updating attribute map for: "{0}" to "{1}"'.format(key, new_name))
+                new_attribute_map[new_name] = item
+            else:
+                print('Copying over other attributes...')
+                new_attribute_map[key] = item
+        self.attribute_map = new_attribute_map
 
     def _print(self):
         print("=== BUTTON INFORMATION ===\n"
@@ -114,8 +135,8 @@ class Button(_button):
                 settings[set] = input_settings[set]
 
         _button.__init__(self, settings['name'], settings['state'], settings['on_state'], settings['off_state'],
-                                 settings['style'], settings['center'], settings['width'], settings['height'],
-                                 settings['color_map'], settings['shapes'])
+                         settings['style'], settings['center'], settings['width'], settings['height'],
+                         settings['color_map'], settings['shapes'])
 
     def _handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN' or action_type == 'LEFT_MOUSE_UP':

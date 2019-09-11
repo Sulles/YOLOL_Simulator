@@ -17,7 +17,10 @@ Please see 'Current Work In Progress' to see what is being worked on, as well as
 ### CYLON AST To Python Converter v0.1 (100% complete)
 Could use better unit tests, see Known Issues below, needs to be fixed
 
-## Current Work In Progress (Planned for 0.1 Release) 93% Complete
+### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (100% complete of 100%)
+Need to link YOLOL external variables to objects in the network and allow user to modify an object's 'external variables' names
+
+## Current Work In Progress (Planned for 0.1 Release) 95% Complete
 
 ### GUI (30% complete of 40%)
 It will be possible to create custom 'textures' for all components. Need to implement this with setup. (0% complete of 100%)
@@ -26,18 +29,15 @@ GUI needs to show all objects in a network as well as their states (70% complete
 
 Need to create instructions screen page (80% complete of 100%)
 
-### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (90% complete of 100%)
-Need to link YOLOL external variables to objects in the network and allow user to modify an object's 'external variables' names
-
 ### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
 
 ### Create UI to create Network with specific components (15% complete of 25%)
 
 ### Create GUI for YOLOL Chip interaction (10% complete of 20%)
 
-### Python Emulator Object Classes and Network (9% complete of 9.4%)
+### Python Emulator Object Classes and Network (9.39% complete of 9.4%)
 #### Planned devices for 0.1 Release 
-- YOLOL Chip (80%)
+- YOLOL Chip (99%)
 - Button (99%)
 - Lamp (99%)
 

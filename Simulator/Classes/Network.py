@@ -55,13 +55,13 @@ class Network:
                     action_location[1] in range(obj.hit_box[1][0], obj.hit_box[1][1]):
                 response = obj.handle_action(action_type)
         if response is not None:
-            print('Got response from action: {}'.format(response))
+            # print('Got response from action: {}'.format(response))
             parsed_response = dict()
             for key, item in response.items():
                 parsed_response[str('GLOBAL_' + key)] = item
             for obj in self.objects:
                 if isinstance(obj, Chip):
-                    print('Updating chip "{0}" with data: {1}'.format(obj.name, parsed_response))
+                    # print('Updating chip "{0}" with data: {1}'.format(obj.name, parsed_response))
                     obj.update_kwargs(parsed_response)
 
     def get_closest_obj(self, action_location):
@@ -107,6 +107,5 @@ class Network:
                     # print('finding object with attribute: "%s"' % attr_name)
                     for obj in self.objects:
                         if attr_name in obj.get_attributes():
-                            print('Updating "{0}" attribute "{1}" to value: {2}'.format(
-                                obj.name, attr_name, value))
+                            # print('Updating "{0}" attribute "{1}" to value: {2}'.format(obj.name, attr_name, value))
                             obj.modify_attr(attr_name, value)
