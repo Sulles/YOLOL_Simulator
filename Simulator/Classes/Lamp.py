@@ -114,11 +114,12 @@ class Lamp(PygameObj):
         :param attr: string of attribute/global variable to be changed
         :param new_value: new value for the corresponding attribute
         """
+        # TODO: Add all other attributes to self.attribute_map and implement here
         try:
             if self.attribute_map[attr] == 'lampon':
                 self.toggle_on_off(new_value)
         except AttributeError:
-            print('The attribute provided is either not supported or cannot be modified by YOLOL code!')
+            print('"%s" does not support modifying "%s" at this time!' % (self.name, str(attr)))
 
     def change_attr_name(self, old_name, new_name):
         """

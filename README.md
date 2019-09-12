@@ -20,10 +20,10 @@ Could use better unit tests, see Known Issues below, needs to be fixed
 ### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (100% complete of 100%)
 Need to link YOLOL external variables to objects in the network and allow user to modify an object's 'external variables' names
 
-## Current Work In Progress (Planned for 0.1 Release) 95% Complete
+## Current Work In Progress (Planned for 0.1 Release) 85% Complete
 
 ### GUI (30% complete of 40%)
-It will be possible to create custom 'textures' for all components. Need to implement this with setup. (0% complete of 100%)
+It should be possible to create custom 'textures' for all components. Need to implement this with setup. (0% complete of 100%)
 
 GUI needs to show all objects in a network as well as their states (70% complete of 100%)
 
@@ -31,7 +31,7 @@ Need to create instructions screen page (80% complete of 100%)
 
 ### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
 
-### Create UI to create Network with specific components (15% complete of 25%)
+### Create UI to create Network with specific components (30% complete of 50%)
 
 ### Create GUI for YOLOL Chip interaction (10% complete of 20%)
 

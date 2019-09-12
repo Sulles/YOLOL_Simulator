@@ -49,10 +49,15 @@ class GUI:
         self.creating_network = False
         self.create_step = 0
         self.create_steps = ['select_objects', 'modify_attributes', 'instantiate_network']
-        self.possible_objects = ListObj(list(obj_map.keys()), display_settings)
+        self.possible_objects = ListObj(list(obj_map.keys()), display_settings, x_offset=-100, y_offset=50)
         self.option_obj_map = dict(select_objects=self.possible_objects)
-        # TODO: add something for modify_attributes and instantiate_network to option_obj_map
+        self.create_how_many_objects = dict()
+        for _ in list(obj_map.keys()):
+            self.create_how_many_objects[_] = 0
         self.current_list_obj = None
+        self.left_selected_key = None
+        self.right_selected_key = None
+        # TODO: add something for modify_attributes and instantiate_network to option_obj_map
 
     def add_network(self, name, network):
         self.network_names.append(name)
@@ -72,9 +77,26 @@ class GUI:
 
     def create_network(self):
         self.creating_network = True
+        self.current_list_obj = self.possible_objects
 
     def draw_create_network(self, surface):
-        print('Network creation step: %s' % self.create_steps[self.create_step])
+        # TODO: draw self.create_how_many_objects somewhere in this function
+        if self.left_selected_key is not None:
+            self.left_selected_key = list(obj_map.keys())[self.left_selected_key]
+            print('Got object to be added: "{}"'.format(self.left_selected_key))
+            # TODO: update self.create_how_many_objects here
+            self.left_selected_key = None
+        if self.right_selected_key is not None:
+            self.right_selected_key = list(obj_map.keys())[self.right_selected_key]
+            print('Got object to be removed: "{}"'.format(self.right_selected_key))
+            # TODO: update self.create_how_many_objects here
+            self.right_selected_key = None
+        # print('Network creation step: %s' % self.create_steps[self.create_step])
+        text_render = self.large_font.render('Create a new network!', True, (255, 255, 255))
+        text_rect = text_render.get_rect()
+        text_rect.x = int(self.display_settings['width']/2 - text_rect.width/2)
+        text_rect.y = int(text_rect.height + 20)
+        surface.blit(text_render, text_rect)
         if self.create_steps[self.create_step] == 'select_objects':
             self.possible_objects.draw(surface)
 
@@ -89,12 +111,15 @@ class GUI:
 
     def handle_action(self, action_type, mouse_pos=None):
         if action_type == 'ESCAPE':
+            print('Exiting out of everything')
             self.creating_network = False
+            self.current_list_obj = None
         elif action_type == 'MOUSE_HOVER':
             self.current_list_obj.handle_hover(mouse_pos)
-        elif action_type == 'MOUSE_DOWN':
-            self.selected_key = self.current_list_obj.handle_mouse_down(mouse_pos)
-            return self.update_current_list()
+        elif action_type == 'LEFT_MOUSE_DOWN':
+            self.left_selected_key = self.current_list_obj.handle_left_mouse_down(mouse_pos)
+        elif action_type == 'RIGHT_MOUSE_DOWN':
+            self.right_selected_key = self.current_list_obj.handle_right_mouse_down(mouse_pos)
         else:
             print('Unsupported action detected! Got: {}'.format(action_type))
             raise AttributeError

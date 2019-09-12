@@ -86,8 +86,17 @@ class _button(PygameObj):
         :param attr: string of attribute/global variable to be changed
         :param new_value: new value for the corresponding attribute
         """
-        # TODO: do this... at some point XD
-        print('"%s" does not support modifying "%s" at this time!' % (self.name, str(attr)))
+        try:
+            if self.attribute_map[attr] == 'buttonstate':
+                self.update_state(new_value)
+            elif self.attribute_map[attr] == 'buttononstate':
+                print('"{0}" changed from {1} to {2}'.format(attr, self.buttononstate, new_value))
+                self.buttononstate = new_value
+            elif self.attribute_map[attr] == 'buttonoffstate':
+                print('"{0}" changed from {1} to {2}'.format(attr, self.buttonoffstate, new_value))
+                self.buttonoffstate = new_value
+        except AttributeError:
+            print('"%s" does not support modifying "%s" at this time!' % (self.name, str(attr)))
 
     def change_attr_name(self, old_name, new_name):
         """

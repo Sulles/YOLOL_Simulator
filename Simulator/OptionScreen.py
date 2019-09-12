@@ -42,12 +42,13 @@ class ErrorObj(pygame_obj.PygameObj):
 
 
 class ListObj:
-    def __init__(self, list_of_entries, screen_size):
+    def __init__(self, list_of_entries, screen_size, x_offset=0, y_offset=0):
         """
         Constructor
         :param list_of_entries: a list of strings
         :param screen_size: list/tuple of length 2 where id 0 = width and id 1 = height
-        :param font: pygame.font.Font object
+        :param x_offset: int of how far left/right the screen list will start to be displayed in pixels
+        :param y_offset: int of how far up/down the screen list will start to be displayed in pixels
         """
         self.entries = list_of_entries
         self.objects = []
@@ -77,8 +78,8 @@ class ListObj:
                      'height': 40}})
 
             self.objects.append(
-                pygame_obj.PygameObj([int(screen_size['width'] / 2) + 100,
-                                      int(100 + (70 * x))],
+                pygame_obj.PygameObj([int(screen_size['width'] / 2) + 100 + x_offset,
+                                      int(100 + (70 * x) + y_offset)],
                                      200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes,
                                      text=list_of_entries[x],
                                      Font=self.font))
@@ -96,12 +97,19 @@ class ListObj:
             else:
                 obj.update_color(0)
 
-    def handle_mouse_down(self, mouse_pos):
+    def handle_left_mouse_down(self, mouse_pos):
         for obj in self.objects:
             if obj.in_hit_box(mouse_pos):
                 print('Got left click "%s" in list object' % self.entries[self.active_entry])
                 return self.active_entry
         print('Got un-interesting left click, ignoring')
+
+    def handle_right_mouse_down(self, mouse_pos):
+        for obj in self.objects:
+            if obj.in_hit_box(mouse_pos):
+                print('Got right click "%s" in list object' % self.entries[self.active_entry])
+                return self.active_entry
+        print('Got un-interesting right click, ignoring')
 
     @staticmethod
     def distance(a, b):
@@ -133,6 +141,12 @@ class OptionScreen:
         self.error = None
         self.error_screens = dict()
         self.error_screens['incomplete_feature'] = ErrorObj('Incomplete Feature!', screen_size)
+
+    def print(self):
+        print('=== OPTION SCREEN INFO ===\n'
+              'Error State: {0}\n'
+              'Selected Key: {1}\n'
+              'Current List Selected: {2}'.format(self.error, self.selected_key, self.current_list_obj.entries))
 
     def update_current_list(self):
         if isinstance(self.selected_key, int):
@@ -207,12 +221,11 @@ class OptionScreen:
             self.toggle_activate()
         elif action_type == 'MOUSE_HOVER':
             self.current_list_obj.handle_hover(mouse_pos)
-        elif action_type == 'MOUSE_DOWN':
-            self.selected_key = self.current_list_obj.handle_mouse_down(mouse_pos)
+        elif action_type == 'LEFT_MOUSE_DOWN':
+            self.selected_key = self.current_list_obj.handle_left_mouse_down(mouse_pos)
             return self.update_current_list()
         else:
             print('Unsupported action detected! Got: {}'.format(action_type))
-            raise AttributeError
 
     def show_incomplete_feature(self):
         self.is_active = True

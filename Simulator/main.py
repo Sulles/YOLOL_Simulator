@@ -78,35 +78,48 @@ def simulator():
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     # Show main screen
-                    option_screen.handle_action('ESCAPE')
+                    print('Got escape!')
+                    if gui.creating_network:
+                        print('currently creating a network')
+                        gui.handle_action('ESCAPE')
+                    else:
+                        print('option screen is handling escape now')
+                        option_screen.handle_action('ESCAPE')
+                        # option_screen.print()
 
             # MOUSE BUTTON DOWN
             elif event.type == MOUSEBUTTONDOWN:
                 # RIGHT CLICK
                 if event.button == 3:
-                    print('Right click found: {}'.format(event.pos))
-                    if not option_screen.is_active and not gui.creating_network:
+                    # print('Right click found: {}'.format(event.pos))
+                    if option_screen.is_active:
+                        if gui.creating_network:
+                            gui.handle_action('RIGHT_MOUSE_DOWN', event.pos)
+                        else:
+                            option_screen.handle_action('RIGHT_MOUSE_DOWN', event.pos)
+                    else:
                         selected_obj = all_networks[selected_network].get_closest_obj(event.pos)
                         print('Got closest obj with name: "%s"' % selected_obj.name)
+
                 # LEFT CLICK
                 elif event.button == 1:
+                    # print('Left click found: {}'.format(event.pos))
                     if option_screen.is_active:
-                        response = option_screen.handle_action('MOUSE_DOWN', event.pos)
+                        response = None
+                        if gui.creating_network:
+                            gui.handle_action('LEFT_MOUSE_DOWN', event.pos)
+                        else:
+                            response = option_screen.handle_action('LEFT_MOUSE_DOWN', event.pos)
+
                         if response is not None:
                             if response['type'] == 'terminate':
                                 terminate()
                             elif response['type'] == 'add network':
-                                # TODO Handle passing new network information from OptionScreen to all_networks here!
-                                #  Maybe to the instantiation of the network in main as well?
                                 gui.create_network()
+                                # TODO: wrap up here
                                 # all_networks.append(create_new_network())
-                                option_screen.show_incomplete_feature()
                             else:
                                 option_screen.show_incomplete_feature()
-                    elif not gui.creating_network:
-                        print('Left click found: {}'.format(event.pos))
-                        for network in all_networks:
-                            network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
             # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
@@ -118,6 +131,8 @@ def simulator():
                 # LEFT CLICK
                 if event.button == 1:
                     if not option_screen.is_active and not gui.creating_network:
+                        # TODO: investigate if it is worth it to make Network.handle_action consistent with all other
+                        #   handle actions where action_type comes first and event locations comes second
                         all_networks[selected_network].handle_action(event.pos, action_type='LEFT_MOUSE_UP')
 
         # Follow mouse
@@ -129,6 +144,7 @@ def simulator():
 
         # Drawing objects
         if gui.creating_network:
+            gui.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             gui.draw_create_network(surface)
         elif option_screen.is_active:
             option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
