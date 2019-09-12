@@ -18,7 +18,6 @@ Please see 'Current Work In Progress' to see what is being worked on, as well as
 Could use better unit tests, see Known Issues below, needs to be fixed
 
 ### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (100% complete of 100%)
-Need to link YOLOL external variables to objects in the network and allow user to modify an object's 'external variables' names
 
 ## Current Work In Progress (Planned for 0.1 Release) 85% Complete
 
