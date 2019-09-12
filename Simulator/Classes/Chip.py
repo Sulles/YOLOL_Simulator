@@ -139,6 +139,9 @@ class _chip(PygameObj):
                 self.chipwait -= 1
                 print('Chip wait decremented to: %d' % self.chipwait)
 
+            # create kwargs copy to compare if anything has changed
+            kwargs_copy = copy(self.kwargs)
+
             # TODO: if only 1 line in AST, make sure lines 2-20 are also 'executed'
             # print('Starting to execute line %d' % self.current_line)
             if self.lines[self.current_line - 1] is not None:
@@ -147,7 +150,10 @@ class _chip(PygameObj):
                 if goto:
                     # print('Got goto: %d' % goto)
                     self.current_line = goto
-            return copy(self.kwargs)
+
+            # only update kwargs if something changed
+            if self.kwargs != kwargs_copy:
+                return copy(self.kwargs)
         else:
             print('ERROR: Tried to run next line too soon!')
             return None

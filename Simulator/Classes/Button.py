@@ -63,9 +63,12 @@ class _button(PygameObj):
                 'INVALID BUTTON STATE: Button Style "%s" only allows for 4 states' % self.buttonstyle
             self.maxstate = 5
 
-    def increment_state(self):
-        self.internal_state = (self.internal_state + 1) % self.maxstate
-        return self.update_state(self.internal_state)
+    def toggle_internal_state(self):
+        self.internal_state = (self.internal_state + 1) % 2
+        if self.internal_state:
+            return self.update_state(self.buttononstate)
+        else:
+            return self.update_state(self.buttonoffstate)
 
     def update_state(self, new_state):
         print('"{0}" buttonstate updated from {1} to {2}'.format(self.name, self.buttonstate, new_state))
@@ -143,7 +146,7 @@ class Button(_button):
 
     def _handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN' or action_type == 'LEFT_MOUSE_UP':
-            return self.increment_state()
+            return self.toggle_internal_state()
 
     # MISC
     def print(self):
@@ -186,7 +189,7 @@ if __name__ == "__main__":
     butt.print()
 
     try:
-        butt.increment_state()
+        butt.toggle_internal_state()
         if butt.buttonstate not in range(butt.maxstate):
             print('UNIT TEST ERROR: This should have failed!')
     except AssertionError:
