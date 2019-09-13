@@ -73,7 +73,7 @@ class Lamp(PygameObj):
                 self.lampon = False
             else:
                 self.lampon = True
-        print('Lamp "%s" new state is: %d' % (self.name, self.lampon))
+        # print('Lamp "%s" new state is: %d' % (self.name, self.lampon))
         self.enable_disable()
         return dict(lampon=copy(self.lampon))
 

@@ -42,23 +42,31 @@ class ErrorObj(pygame_obj.PygameObj):
 
 
 class ListObj:
-    def __init__(self, list_of_entries, screen_size, x_offset=0, y_offset=0):
+    def __init__(self, list_of_entries, screen_size, width=300, height=50, x_offset=0, y_offset=0):
         """
         Constructor
         :param list_of_entries: a list of strings
         :param screen_size: list/tuple of length 2 where id 0 = width and id 1 = height
+        :param width: int pixel width of box for each item in the list
+        :param height: int pixel height of box for each item in the list
         :param x_offset: int of how far left/right the screen list will start to be displayed in pixels
         :param y_offset: int of how far up/down the screen list will start to be displayed in pixels
         """
         self.entries = list_of_entries
+        self.screen_size = screen_size
         self.objects = []
         self.font = font.Font('src/Cubellan.ttf', 16)
         self.active_entry = None
+        self.width = width
+        self.height = height
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.init_objects()
 
+    def init_objects(self):
         # print('Instantiating new List Object. List of entries: {}'.format(
         #     list_of_entries))
-
-        for x in range(0, len(list_of_entries)):
+        for x in range(0, len(self.entries)):
             # print('Creating shape for list entry "%s"' % list_of_entries[x])
             shapes = list()
             shapes.append(
@@ -67,22 +75,34 @@ class ListObj:
                  'width': 2,
                  'settings': {
                      'center': [0, 0],
-                     'width': 300,
-                     'height': 50}})
+                     'width': self.width,
+                     'height': self.height}})
             shapes.append(
                 {'type': 'rect',
                  'color': None,
                  'settings': {
                      'center': [0, 0],
-                     'width': 280,
-                     'height': 40}})
+                     'width': self.width - 20,
+                     'height': self.height - 10}})
 
             self.objects.append(
-                pygame_obj.PygameObj([int(screen_size['width'] / 2) + 100 + x_offset,
-                                      int(100 + (70 * x) + y_offset)],
+                pygame_obj.PygameObj([int(self.screen_size['width'] / 2) + 100 + self.x_offset,
+                                      int(100 + (self.height * 1.5 * x) + self.y_offset)],
                                      200, 50, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes,
-                                     text=list_of_entries[x],
+                                     text=self.entries[x],
                                      Font=self.font))
+
+    def update_text(self, text_list):
+        try:
+            assert len(text_list) == len(self.entries), \
+                'Please provide a text list for every entry! You provided {0} entries, you need {1}!'.format(
+                    len(text_list), len(self.entries))
+            self.entries = text_list
+            self.objects = list()
+            self.init_objects()
+
+        except Exception:
+            print('Could not update text! Was given input: {}'.format(text_list))
 
     def draw(self, surface):
         for obj in self.objects:

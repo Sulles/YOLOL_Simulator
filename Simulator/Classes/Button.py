@@ -65,14 +65,14 @@ class _button(PygameObj):
 
     def toggle_internal_state(self):
         self.internal_state = (self.internal_state + 1) % 2
-        print('"%s" Internal state is: %d' % (self.name, self.internal_state))
+        # print('"%s" Internal state is: %d' % (self.name, self.internal_state))
         if self.internal_state:
             return self.update_state(self.buttononstate)
         else:
             return self.update_state(self.buttonoffstate)
 
     def update_state(self, new_state=None):
-        print('"{0}" buttonstate updated from {1} to {2}'.format(self.name, self.buttonstate, new_state))
+        # print('"{0}" buttonstate updated from {1} to {2}'.format(self.name, self.buttonstate, new_state))
         self.buttonstate = new_state
         self.run_assert()
         self._update_color(self.internal_state)
@@ -89,13 +89,13 @@ class _button(PygameObj):
         """
         try:
             if self.attribute_map[attr] == 'buttonstate':
-                print('"{0}" changed from {1} to {2}'.format(attr, self.buttonstate, new_value))
+                # print('"{0}" changed from {1} to {2}'.format(attr, self.buttonstate, new_value))
                 self.buttonstate = new_value
             elif self.attribute_map[attr] == 'buttononstate':
-                print('"{0}" changed from {1} to {2}'.format(attr, self.buttononstate, new_value))
+                # print('"{0}" changed from {1} to {2}'.format(attr, self.buttononstate, new_value))
                 self.buttononstate = new_value
             elif self.attribute_map[attr] == 'buttonoffstate':
-                print('"{0}" changed from {1} to {2}'.format(attr, self.buttonoffstate, new_value))
+                # print('"{0}" changed from {1} to {2}'.format(attr, self.buttonoffstate, new_value))
                 self.buttonoffstate = new_value
         except AttributeError:
             print('"%s" does not support modifying "%s" at this time!' % (self.name, str(attr)))

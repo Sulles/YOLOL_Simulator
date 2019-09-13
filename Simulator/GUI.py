@@ -49,11 +49,14 @@ class GUI:
         self.creating_network = False
         self.create_step = 0
         self.create_steps = ['select_objects', 'modify_attributes', 'instantiate_network']
-        self.possible_objects = ListObj(list(obj_map.keys()), display_settings, x_offset=-100, y_offset=50)
+        self.possible_objects = ListObj(list(obj_map.keys()), display_settings,
+                                        width=100, height=30, x_offset=-100, y_offset=50)
         self.option_obj_map = dict(select_objects=self.possible_objects)
         self.create_how_many_objects = dict()
         for _ in list(obj_map.keys()):
             self.create_how_many_objects[_] = 0
+        self.how_many_objects = ListObj(list([str(_) for _ in self.create_how_many_objects.values()]), display_settings,
+                                        width=30, height=30, y_offset=50)
         self.current_list_obj = None
         self.left_selected_key = None
         self.right_selected_key = None
@@ -79,18 +82,31 @@ class GUI:
         self.creating_network = True
         self.current_list_obj = self.possible_objects
 
-    def draw_create_network(self, surface):
-        # TODO: draw self.create_how_many_objects somewhere in this function
+    def verify_create_objects_bounds(self):
+        for key, item in self.create_how_many_objects.items():
+            if item < 0:
+                self.create_how_many_objects[key] = 0
+                self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
+
+    def handle_selected_key(self):
         if self.left_selected_key is not None:
             self.left_selected_key = list(obj_map.keys())[self.left_selected_key]
-            print('Got object to be added: "{}"'.format(self.left_selected_key))
-            # TODO: update self.create_how_many_objects here
+            # print('Got object to be added: "{}"'.format(self.left_selected_key))
+            self.create_how_many_objects[self.left_selected_key] += 1
             self.left_selected_key = None
+            self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
         if self.right_selected_key is not None:
             self.right_selected_key = list(obj_map.keys())[self.right_selected_key]
-            print('Got object to be removed: "{}"'.format(self.right_selected_key))
-            # TODO: update self.create_how_many_objects here
+            # print('Got object to be removed: "{}"'.format(self.right_selected_key))
+            self.create_how_many_objects[self.right_selected_key] -= 1
             self.right_selected_key = None
+            self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
+
+    def draw_create_network(self, surface):
+        # TODO: MOVE ALL OF THIS OBJECT LIST SHENANIGANS INTO AN OBJECT!!!
+        self.verify_create_objects_bounds()
+        self.handle_selected_key()
+
         # print('Network creation step: %s' % self.create_steps[self.create_step])
         text_render = self.large_font.render('Create a new network!', True, (255, 255, 255))
         text_rect = text_render.get_rect()
@@ -99,6 +115,7 @@ class GUI:
         surface.blit(text_render, text_rect)
         if self.create_steps[self.create_step] == 'select_objects':
             self.possible_objects.draw(surface)
+            self.how_many_objects.draw(surface)
 
     def draw(self, surface, network=None):
         for x in range(len(self.net_info)):
