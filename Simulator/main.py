@@ -120,6 +120,11 @@ def simulator():
                                 # all_networks.append(create_new_network())
                             else:
                                 option_screen.show_incomplete_feature()
+                    # not option screen, interact with all objects as normal
+                    else:
+                        print('Left click found: {}'.format(event.pos))
+                        for network in all_networks:
+                            network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
 
             # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
