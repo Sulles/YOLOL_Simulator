@@ -115,7 +115,7 @@ def simulator():
                             if response['type'] == 'terminate':
                                 terminate()
                             elif response['type'] == 'add network':
-                                gui.create_network()
+                                gui.creating_network = True
                                 # TODO: wrap up here
                                 # all_networks.append(create_new_network())
                             else:

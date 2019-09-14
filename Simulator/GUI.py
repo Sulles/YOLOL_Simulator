@@ -20,9 +20,61 @@ import pygame.draw
 from pygame import Rect
 
 
+class ExtendedListObj:
+    def __init__(self, list_of_entry_names, screen_size, width=300, height=50, x_offset=0, y_offset=0):
+        self.entry_names = list_of_entry_names
+        self.screen_size = screen_size
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.main_list = ListObj(list_of_entry_names, screen_size, width=width, height=height, x_offset=x_offset, y_offset=y_offset)
+        self.entry_value_map = dict()
+        for _ in list_of_entry_names:
+            self.entry_value_map[_] = 0
+        self.values_list = None
+        self.update_values()
+
+    def draw(self, surface):
+        self.main_list.draw(surface)
+        self.values_list.draw(surface)
+
+    def check_values_range(self):
+        for key, value in self.entry_value_map.items():
+            if value < 0:
+                self.entry_value_map[key] = 0
+
+    def update_values(self):
+        self.check_values_range()
+        self.values_list = ListObj(list([str(_) for _ in self.entry_value_map.values()]), self.screen_size,
+                                   width=30, height=30, x_offset=self.x_offset + 80, y_offset=self.y_offset)
+
+    def handle_action(self, action_type, mouse_pos=None):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            active_entry = self.main_list.handle_left_mouse_down(mouse_pos)
+            if active_entry is not None:
+                self.entry_value_map[self.entry_names[active_entry]] += 1
+                self.update_values()
+        elif action_type == 'RIGHT_MOUSE_DOWN':
+            active_entry = self.main_list.handle_right_mouse_down(mouse_pos)
+            if active_entry is not None:
+                self.entry_value_map[self.entry_names[active_entry]] -= 1
+                self.update_values()
+        elif action_type == 'MOUSE_HOVER':
+            self.main_list.handle_hover(mouse_pos)
+        else:
+            return None
+
+
+class TabList:
+    def __init__(self, tab_names, display_settings):
+        self.display_settings = display_settings
+        # TODO: Do this next! ===========================================
+
+
 class GUI:
     def __init__(self, display_settings):
         self.display_settings = display_settings
+        self.center = [int(display_settings['width'] / 2),
+                       int(display_settings['height'] / 2)]
 
         # SETTING UP FONT
         self.small_font = pygame.font.Font('src/Cubellan.ttf', 8)
@@ -49,20 +101,12 @@ class GUI:
         self.creating_network = False
         self.create_step = 0
         self.create_steps = ['select_objects', 'modify_attributes', 'instantiate_network']
-        self.possible_objects = ListObj(list(obj_map.keys()), display_settings,
-                                        width=100, height=30, x_offset=-100, y_offset=50)
-        self.option_obj_map = dict(select_objects=self.possible_objects)
-        self.create_how_many_objects = dict()
-        for _ in list(obj_map.keys()):
-            self.create_how_many_objects[_] = 0
-        self.how_many_objects = ListObj(list([str(_) for _ in self.create_how_many_objects.values()]), display_settings,
-                                        width=30, height=30, y_offset=50)
-        self.current_list_obj = None
-        self.left_selected_key = None
-        self.right_selected_key = None
+        self.select_objects_list = ExtendedListObj(list(obj_map.keys()), display_settings,
+                                           width=100, height=30, x_offset=-300, y_offset=-100)
         # TODO: add something for modify_attributes and instantiate_network to option_obj_map
 
     def add_network(self, name, network):
+        print('Adding network "{}"'.format(name))
         self.network_names.append(name)
         # def __init__(self, center, width, height, color_map, shapes, text=None, Font=None):
         top_left = [int(200 + 240 * len(self.network_names)), 80]
@@ -72,15 +116,19 @@ class GUI:
         center = [int(200 + 120*len(self.network_names)),
                   int(80)]
         # def __init__(self, center, width, height, color_map, shapes, text=None, Font=None):
-        self.tabs.append(PygameObj(center, 500, 500, [(100, 100, 100), (200, 200, 200)], [
+        self.tabs.append(PygameObj(self.center, 500, 500, [(100, 100, 100), (200, 200, 200)], [
             {'type': 'point_list',
              'color': None,
              'center': center,
              'point_list': [top_left, top_right, bottom_right, bottom_left]}]))
 
-    def create_network(self):
-        self.creating_network = True
-        self.current_list_obj = self.possible_objects
+    def remove_network(self, name):
+        print('Removing network "{}"'.format(name))
+        assert name in self.network_names, 'This network does not exist!'
+        index = self.network_names.index(name)
+        self.tabs.remove(index)
+        self.network_names.remove(name)
+
 
     def verify_create_objects_bounds(self):
         for key, item in self.create_how_many_objects.items():
@@ -88,25 +136,7 @@ class GUI:
                 self.create_how_many_objects[key] = 0
                 self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
 
-    def handle_selected_key(self):
-        if self.left_selected_key is not None:
-            self.left_selected_key = list(obj_map.keys())[self.left_selected_key]
-            # print('Got object to be added: "{}"'.format(self.left_selected_key))
-            self.create_how_many_objects[self.left_selected_key] += 1
-            self.left_selected_key = None
-            self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
-        if self.right_selected_key is not None:
-            self.right_selected_key = list(obj_map.keys())[self.right_selected_key]
-            # print('Got object to be removed: "{}"'.format(self.right_selected_key))
-            self.create_how_many_objects[self.right_selected_key] -= 1
-            self.right_selected_key = None
-            self.how_many_objects.update_text(list([str(_) for _ in self.create_how_many_objects.values()]))
-
     def draw_create_network(self, surface):
-        # TODO: MOVE ALL OF THIS OBJECT LIST SHENANIGANS INTO AN OBJECT!!!
-        self.verify_create_objects_bounds()
-        self.handle_selected_key()
-
         # print('Network creation step: %s' % self.create_steps[self.create_step])
         text_render = self.large_font.render('Create a new network!', True, (255, 255, 255))
         text_rect = text_render.get_rect()
@@ -114,8 +144,7 @@ class GUI:
         text_rect.y = int(text_rect.height + 20)
         surface.blit(text_render, text_rect)
         if self.create_steps[self.create_step] == 'select_objects':
-            self.possible_objects.draw(surface)
-            self.how_many_objects.draw(surface)
+            self.select_objects_list.draw(surface)
 
     def draw(self, surface, network=None):
         for x in range(len(self.net_info)):
@@ -124,20 +153,12 @@ class GUI:
         #     # Display all objects here
         #     pass
         for tab in self.tabs:
+            print('Drawing tab?')
             tab.draw(surface)
 
     def handle_action(self, action_type, mouse_pos=None):
         if action_type == 'ESCAPE':
             print('Exiting out of everything')
             self.creating_network = False
-            self.current_list_obj = None
-        elif action_type == 'MOUSE_HOVER':
-            self.current_list_obj.handle_hover(mouse_pos)
-        elif action_type == 'LEFT_MOUSE_DOWN':
-            self.left_selected_key = self.current_list_obj.handle_left_mouse_down(mouse_pos)
-        elif action_type == 'RIGHT_MOUSE_DOWN':
-            self.right_selected_key = self.current_list_obj.handle_right_mouse_down(mouse_pos)
         else:
-            print('Unsupported action detected! Got: {}'.format(action_type))
-            raise AttributeError
-
+            self.select_objects_list.handle_action(action_type, mouse_pos)
