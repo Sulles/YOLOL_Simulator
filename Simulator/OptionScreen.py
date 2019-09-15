@@ -86,7 +86,7 @@ class ListObj:
                      'height': self.height - 10}})
 
             self.objects.append(
-                pygame_obj.PygameObj([int(self.screen_size['width'] / 2 + self.width / 2) + self.x_offset,
+                pygame_obj.PygameObj([int(self.screen_size['width'] / 2) + self.x_offset,
                                       int(self.screen_size['height'] / 2 + (self.height * 1.5 * x) + self.y_offset)],
                                      self.width, self.height, [(0, 0, 0), (100, 100, 100), (0, 200, 0)], shapes,
                                      text=self.entries[x],
@@ -148,9 +148,9 @@ class OptionScreen:
             'Exit': []
         }
 
-        self.main_list = ListObj([_ for _ in self.options_text.keys()], screen_size, y_offset=-100)
-        self.network_list = ListObj(self.options_text['Edit networks'], screen_size, y_offset=-100)
-        self.yolol_list = ListObj(self.options_text['Edit YOLOL code'], screen_size, y_offset=-100)
+        self.main_list = ListObj([_ for _ in self.options_text.keys()], screen_size, y_offset=-150)
+        self.network_list = ListObj(self.options_text['Edit networks'], screen_size, y_offset=-150)
+        self.yolol_list = ListObj(self.options_text['Edit YOLOL code'], screen_size, y_offset=-150)
         # TODO: make sure yolol_list can be updated appropriately, will probably need to create a new obj for each
         #  new chip created
         self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size)

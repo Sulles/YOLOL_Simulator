@@ -10,21 +10,22 @@ This is the main simulator code. From here, users can
 TODO: Make shift + right click = plane move?
 """
 
-import pygame
-import sys
 import os
-from pygame.locals import *
-# from time import time
-# from pprint import pprint
+import sys
 
-# noinspection PyUnresolvedReferences
-from src.constants import colors
-# noinspection PyUnresolvedReferences
-from GUI import GUI
+import pygame
 # noinspection PyUnresolvedReferences
 from Classes.Network import Network
 # noinspection PyUnresolvedReferences
+from GUI import GUI
+# noinspection PyUnresolvedReferences
 from OptionScreen import OptionScreen
+from pygame.locals import *
+# noinspection PyUnresolvedReferences
+from src.constants import colors
+
+# from time import time
+# from pprint import pprint
 
 sys.path.append('Classes')
 os.path.join('Classes')

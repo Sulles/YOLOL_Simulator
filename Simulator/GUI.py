@@ -121,7 +121,7 @@ class TabList:
     def remove_tab(self, name):
         index = self.tab_names.index(name)
         self.tab_names.remove(name)
-        del(self.tabs[index])
+        del self.tabs[index]
         self.recreate_tabs()
 
     def recreate_tabs(self):
