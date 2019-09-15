@@ -7,15 +7,15 @@ Author: Sulles
 === DESCRIPTION ===
 This class houses the GUI
 """
-import pygame.draw
-import pygame.font
+from copy import copy
+
 # noinspection PyUnresolvedReferences
 from Classes.map import obj_map
 # noinspection PyUnresolvedReferences
 from Classes.pygame_obj import PygameObj
 # noinspection PyUnresolvedReferences
 from OptionScreen import ListObj
-from pygame import Rect
+from pygame import Rect, draw as pygame_draw, font as pygame_font
 # noinspection PyUnresolvedReferences
 from src.constants import colors
 
@@ -76,10 +76,10 @@ class TabObj(PygameObj):
         self.is_active = False
         width = 100
         height = 28
-        point_list = [[int(4 - width / 2), int(-height / 2)],
-                      [int(width / 2 - 4), int(-height / 2)],
-                      [int(width / 2), int(height / 2)],
-                      [int(-width / 2), int(height / 2)]]
+        point_list = [[int(-width / 2), int(-height / 2)],
+                      [int(width / 2), int(-height / 2)],
+                      [int(width / 2 - 4), int(height / 2)],
+                      [int(4 - width / 2), int(height / 2)]]
         PygameObj.__init__(self, center, width, height, [colors['NAVYBLUE'], colors['DARKGRAY']],
                            [{'type': 'point_list',
                              'point_list': point_list,
@@ -95,10 +95,12 @@ class TabObj(PygameObj):
     def activate(self):
         print('Activating {}'.format(self.name))
         self.is_active = True
+        return copy(self.name)
 
     def deactivate(self):
         print('Deactivating {}'.format(self.name))
         self.is_active = False
+        return None
 
 
 class TabList:
@@ -112,11 +114,16 @@ class TabList:
         self.tab_names.append(name)
         center = self.calculate_center(self.tab_names.index(name))
         self.tabs.append(TabObj(name, center, self.font))
+        for tab in self.tabs:
+            tab.deactivate()
         return self.tabs[-1].activate()
+
+    def get_tab_center(self, index):
+        return copy(self.tabs[index].center)
 
     @staticmethod
     def calculate_center(index):
-        return [int(60 + 100 * index), int(20)]
+        return [int(150 + 100 * index), int(14)]
 
     def remove_tab(self, name):
         index = self.tab_names.index(name)
@@ -128,7 +135,7 @@ class TabList:
         self.tabs = list()
         if len(self.tab_names) > 0:
             for name in self.tab_names:
-                return self.add_tab(name)
+                return copy(self.add_tab(name))
 
     def draw(self, surface):
         for tab in self.tabs:
@@ -139,12 +146,16 @@ class TabList:
             for tab in self.tabs:
                 tab.handle_mouse_hover(mouse_pos)
         elif action_type == 'LEFT_MOUSE_DOWN':
+            print('Got left click. How many tabs?: {0} should match {1}'.format(len(self.tabs), self.tab_names))
+            activated_tab_name = None
             for tab in self.tabs:
+                print('Checking {}'.format(self.tab_names[self.tabs.index(tab)]))
                 if tab.in_hit_box(mouse_pos):
                     tab.activate()
-                    return tab.name
+                    activated_tab_name = copy(tab.name)
                 else:
                     tab.deactivate()
+            return activated_tab_name
         return None
 
 
@@ -155,17 +166,18 @@ class GUI:
                        int(display_settings['height'] / 2)]
 
         # SETTING UP FONT
-        self.small_font = pygame.font.Font('src/Cubellan.ttf', 8)
-        self.basic_font = pygame.font.Font('src/Cubellan.ttf', 12)
-        self.large_font = pygame.font.Font('src/Cubellan.ttf', 18)
+        self.small_font = pygame_font.Font('src/Cubellan.ttf', 8)
+        self.basic_font = pygame_font.Font('src/Cubellan.ttf', 12)
+        self.large_font = pygame_font.Font('src/Cubellan.ttf', 18)
 
         # SETTING UP NETWORK BARS
         self.tab_list = TabList(self.basic_font)
         self.current_tab = None
-        self.network_names = []
+        self.network_names = list()
+        self.networks = list()
 
         # SETTING UP NETWORK SPECIFIC INFO
-        self.position = [10, 35]
+        self.position = [0, 0]
         self.width = 100
         self.height = int(display_settings['height'] / 2)
         self.color = (100, 100, 100)
@@ -184,10 +196,12 @@ class GUI:
                                                    width=100, height=30, x_offset=-300, y_offset=-100)
         # TODO: add something for modify_attributes and instantiate_network to option_obj_map
 
-    def add_network(self, name, network):
-        print('Adding network "{}"'.format(name))
-        self.current_tab = self.tab_list.add_tab(name)
-        self.network_names.append(name)
+    def add_network(self, network):
+        print('Adding network "{}"'.format(network.name))
+        self.current_tab = self.tab_list.add_tab(network.name)
+        self.network_names.append(network.name)
+        self.networks.append(network)
+        return self.network_names.index(network.name)
 
     def remove_network(self, name):
         print('Removing network "{}"'.format(name))
@@ -212,9 +226,27 @@ class GUI:
 
     def draw(self, surface):
         for x in range(len(self.net_info)):
-            pygame.draw.rect(surface, self.net_color_map[x], self.net_info[x], self.net_width_map[x])
-        # TODO: display info from each object in a network!
+            pygame_draw.rect(surface, self.net_color_map[x], self.net_info[x], self.net_width_map[x])
+        if self.current_tab is not None:
+            self.draw_network_info(self.networks[self.network_names.index(self.current_tab)], surface)
         self.tab_list.draw(surface)
+
+    def draw_network_info(self, network, surface):
+        topleft = [10, 10]
+        first_point = list(self.tab_list.get_tab_center(self.networks.index(network)))
+        second_point = [first_point[0], first_point[1] + 20]
+        for obj in network.objects:
+            # Display obj name on top-left
+            text_render = self.basic_font.render(obj.name, True, (255, 255, 255))
+            text_rect = text_render.get_rect()
+            text_rect.topleft = topleft
+            surface.blit(text_render, text_rect)
+            topleft = [topleft[0], topleft[1] + 20]
+            # Show network connection
+            third_point = [obj.center[0], second_point[1]]
+            fourth_point = [obj.center[0], int(obj.center[1] - obj.height / 2)]
+            pygame_draw.lines(surface, colors['LIGHTGRAY'], False,
+                              [first_point, second_point, third_point, fourth_point])
 
     def handle_action(self, action_type, mouse_pos=None):
         if action_type == 'ESCAPE':
@@ -229,7 +261,7 @@ class GUI:
                 if response is not None:
                     print('Changed active tab to: "{}"'.format(response))
                     self.current_tab = response
-                    return True
+                    return dict(type='active_tab', active_tab_index=self.network_names.index(response))
             else:
                 self.tab_list.handle_action(action_type, mouse_pos)
             return None

@@ -19,26 +19,20 @@ Could use better unit tests, see Known Issues below, needs to be fixed
 
 ### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (100% complete of 100%)
 
-## Current Work In Progress (Planned for 0.1 Release) 88% Complete
+## Current Work In Progress (Planned for 0.1 Release) 92% Complete
 
-### GUI (30% complete of 40%)
+### GUI (35% complete of 40%)
 It should be possible to create custom 'textures' for all components. Need to implement this with setup. (0% complete of 100%)
-
-GUI needs to show all objects in a network as well as their states (70% complete of 100%)
 
 Need to create instructions screen page (80% complete of 100%)
 
+##### GUI needs to show all objects in a network (100% complete of 100%)
+
+##### Create UI to create Network with specific components (50% complete of 50%)
+
+##### Create GUI for YOLOL Chip interaction (10% complete of 20%)
+
 ### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
-
-### Create UI to create Network with specific components (40% complete of 50%)
-Add code to display all components in a network and verify code can handle multiple networks
-
-In a future release, consider a drop-down option to display information for each object in a network
-
-### Show 'link' between all objects in a network (0% complete of 100%)
-Maybe accomplish this by having all networks 'linked' to the appropriate network tab?
-
-### Create GUI for YOLOL Chip interaction (10% complete of 20%)
 
 ### Python Emulator Object Classes and Network (9.39% complete of 9.4%)
 #### Planned devices for 0.1 Release 
@@ -46,7 +40,7 @@ Maybe accomplish this by having all networks 'linked' to the appropriate network
 - Button (99%)
 - Lamp (99%)
 
-#### Planned devices for 1.0 Release if not sooner
+#### Planned devices for 1.0 Release or sooner
 - Cargo beam
 - Carge crate
 - Cargo lock frame
@@ -82,6 +76,8 @@ Maybe accomplish this by having all networks 'linked' to the appropriate network
 
 ## Planned work for 0.2 Release
 Dynamically create line methods as a part of each YOLOL chip object rather than having the interpreter create the functions and hard code the YOLOL Chip to import from the file the interpreter created
+
+Improve network GUI by having a drop-down option to display information for each object in a network
 
 ## Want to Contribute?
 This is an open source project and all contributions are welcome! Feel free to join the discord channel dedicated to CYLONS https://discord.gg/rmu6aCr and PM me (username=StolenLight) and I would be more than happy to discuss how you would like to help!

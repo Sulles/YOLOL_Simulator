@@ -203,7 +203,7 @@ class OptionScreen:
         # EDIT NETWORK OPTIONS
         elif self.selected_key == 'Create a new network':
             print('You want to create a new network! Cool!')
-            return dict(type='add network')
+            return dict(type='add_network')
 
         else:
             print('what even is the selected key?: {}'.format(self.selected_key))

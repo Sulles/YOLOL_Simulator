@@ -48,24 +48,35 @@ def simulator():
     selected_network = 0
     all_networks = []
     network_settings = {'Lamp':
-                            {'name': 'lamp_name',
+                            {'name': 'lamp_1',
                              'state': 1,
-                             'center': [DISPLAY['width'] - 100, DISPLAY['height'] / 2]},
+                             'center': [DISPLAY['width'] / 2 - 80, DISPLAY['height'] / 2]},
                         'Button0':
-                            {'name': 'butt_name',
+                            {'name': 'button_1',
                              'state': 0,
-                             'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2 + 100],
+                             'center': [DISPLAY['width'] / 2 - 100, DISPLAY['height'] / 2 + 50],
                              'color_map': [colors['RED'], colors['GREEN']]},
                         'Chip':
                             {'name': 'test_chip',
-                             'center': [200, 200]}
+                             'center': [DISPLAY['width'] / 2 - 120, DISPLAY['height'] / 2 + 100]}
                         }
-    all_networks.append(Network('test_network', network_settings))
-    # TODO: add another network to gui and verify network tabs work as expected
-    num = 0
+    all_networks.append(Network('test_network_1', network_settings))
+    network_settings = {'Lamp':
+                            {'name': 'lamp_2',
+                             'state': 1,
+                             'center': [DISPLAY['width'] / 2 + 80, DISPLAY['height'] / 2]},
+                        'Button0':
+                            {'name': 'button_2',
+                             'state': 0,
+                             'center': [DISPLAY['width'] / 2 + 100, DISPLAY['height'] / 2 + 50],
+                             'color_map': [colors['RED'], colors['GREEN']]},
+                        'Chip':
+                            {'name': 'test_chip',
+                             'center': [DISPLAY['width'] / 2 + 120, DISPLAY['height'] / 2 + 100]}
+                        }
+    all_networks.append(Network('test_network_2', network_settings))
     for network in all_networks:
-        num += 1
-        gui.add_network('Network_' + str(num), network)
+        selected_network = gui.add_network(network)
 
     print("Initialization complete, running playground...")
 
@@ -127,16 +138,18 @@ def simulator():
                     # not option screen, interact with all objects as normal
                     else:
                         print('Left click found: {}'.format(event.pos))
-                        if gui.handle_action('LEFT_MOUSE_DOWN', event.pos) is None:
+                        response = gui.handle_action('LEFT_MOUSE_DOWN', event.pos)
+                        if response is None:
                             for network in all_networks:
                                 network.handle_action('LEFT_MOUSE_DOWN', event.pos)
+                        elif response['type'] == 'active_tab':
+                            selected_network = response['active_tab_index']
 
             # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
                 # RIGHT CLICK
                 if event.button == 3:
                     if not option_screen.is_active and not gui.creating_network:
-                        print('Right mouse up found?')
                         selected_obj = None
                 # LEFT CLICK
                 if event.button == 1:
@@ -159,10 +172,10 @@ def simulator():
             option_screen.draw(surface)
         else:
             gui.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
+            gui.draw(surface)
             for network in all_networks:
                 network.step()
                 network.draw(surface)
-            gui.draw(surface)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
