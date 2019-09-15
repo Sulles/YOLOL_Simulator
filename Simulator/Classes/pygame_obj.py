@@ -33,7 +33,7 @@ class PygameObj:
             color_map = [color_map]
 
         # Object parameters
-        self.center = [int(center[0] - width / 2), int(center[1] - height / 2)]
+        self.center = [int(center[0]), int(center[1])]
         self.width = int(width)
         self.height = int(height)
         self.hit_box = None
@@ -78,8 +78,14 @@ class PygameObj:
                          center=center, width=shape['width']))
             elif shape['type'] == 'point_list':
                 self.drawable_shapes.append(
-                    dict(type='shape', color=shape['color'], point_list=[_ for _ in shape['point_list']],
+                    dict(type='shape', color=shape['color'], point_list=self.convert_point_list_to_abs(shape['point_list']),
                          width=shape['width']))
+
+    def convert_point_list_to_abs(self, point_list):
+        for point in point_list:
+            point[0] += self.center[0]
+            point[1] += self.center[1]
+        return point_list
 
     def _update_color(self, map_index):
         self.color = self.color_map[map_index]
@@ -102,8 +108,8 @@ class PygameObj:
                     pygame_draw.rect(surface, color, shape['rect'], shape['width'])
                 elif shape['type'] == 'circle':
                     pygame_draw.circle(surface, color, shape['center'], shape['radius'], shape['width'])
-                elif shape['type'] == 'point_list':
-                    pygame_draw.lines(surface, color, True, shape['point_list'], shape['width'])
+                elif shape['type'] == 'shape':
+                    pygame_draw.polygon(surface, color, shape['point_list'], shape['width'])
         if self.text_render is not None:
             surface.blit(self.text_render, self.text_rect)
 

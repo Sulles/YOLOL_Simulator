@@ -20,7 +20,7 @@ Available options:
 
 # noinspection PyUnresolvedReferences
 from Classes import Button, Chip, Lamp, map, Network, pygame_obj
-from pygame import font, draw as pygame_draw
+from pygame import font
 from math import sqrt
 
 
@@ -246,6 +246,7 @@ class OptionScreen:
             return self.update_current_list()
         else:
             print('Unsupported action detected! Got: ""{}""'.format(action_type))
+        return None
 
     def show_incomplete_feature(self):
         self.is_active = True

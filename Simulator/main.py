@@ -53,7 +53,7 @@ def simulator():
                         'Button0':
                             {'name': 'butt_name',
                              'state': 0,
-                             'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2],
+                             'center': [DISPLAY['width'] / 2, DISPLAY['height'] / 2 + 100],
                              'color_map': [colors['RED'], colors['GREEN']]},
                         'Chip':
                             {'name': 'test_chip',
@@ -61,7 +61,10 @@ def simulator():
                         }
     all_networks.append(Network('test_network', network_settings))
     # TODO: add another network to gui and verify network tabs work as expected
-    gui.add_network('test network', [network for network in all_networks])
+    num = 0
+    for network in all_networks:
+        num += 1
+        gui.add_network('Network_' + str(num), network)
 
     print("Initialization complete, running playground...")
 
@@ -123,8 +126,9 @@ def simulator():
                     # not option screen, interact with all objects as normal
                     else:
                         print('Left click found: {}'.format(event.pos))
-                        for network in all_networks:
-                            network.handle_action(event.pos, action_type='LEFT_MOUSE_DOWN')
+                        if gui.handle_action('LEFT_MOUSE_DOWN', event.pos) is None:
+                            for network in all_networks:
+                                network.handle_action('LEFT_MOUSE_DOWN', event.pos)
 
             # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
@@ -136,9 +140,7 @@ def simulator():
                 # LEFT CLICK
                 if event.button == 1:
                     if not option_screen.is_active and not gui.creating_network:
-                        # TODO: investigate if it is worth it to make Network.handle_action consistent with all other
-                        #   handle actions where action_type comes first and event locations comes second
-                        all_networks[selected_network].handle_action(event.pos, action_type='LEFT_MOUSE_UP')
+                        all_networks[selected_network].handle_action('LEFT_MOUSE_UP', event.pos)
 
         # Follow mouse
         if selected_obj:
@@ -155,6 +157,7 @@ def simulator():
             option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             option_screen.draw(surface)
         else:
+            gui.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             for network in all_networks:
                 network.step()
                 network.draw(surface)

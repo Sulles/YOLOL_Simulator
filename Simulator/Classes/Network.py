@@ -43,7 +43,7 @@ class Network:
         for obj in self.objects:
             obj.print()
 
-    def handle_action(self, action_location, action_type=None):
+    def handle_action(self, action_type, action_location):
         """
         This is the main function that will handle user actions done through pygame
         :param action_location: A list of x, y coords where user action occurred

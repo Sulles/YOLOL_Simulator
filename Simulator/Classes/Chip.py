@@ -129,7 +129,7 @@ class _chip(PygameObj):
 
     def _run_next_line(self):
         if not self.run_line:
-            print('ERROR: Chip disabled!')
+            # print('ERROR: Chip disabled!')
             return None
         elif time() - self.last_run >= 0.2:
             self.last_run = time()
@@ -154,14 +154,14 @@ class _chip(PygameObj):
 
     def _handle_action(self, action_type):
         if action_type == 'LEFT_MOUSE_DOWN':
-            print('self.run_thread?: {}'.format(self.run_line))
+            # print('self.run_thread?: {}'.format(self.run_line))
             self.update_color(self.run_line)
             if not self.run_line:
                 self.run_line = True
-                print('Got command to start next line!')
+                print('Got action to resume execution for {}'.format(self.name))
                 self._run_next_line()
             else:
-                print('Cancelling %s execution...' % self.name)
+                print('Got action to stop execution for {}'.format(self.name))
                 self.run_line = False
 
     def _update_kwargs(self, updated_kwargs):
@@ -234,6 +234,7 @@ class Chip(_chip):
         return self._run_next_line()
 
     def disable(self):
+        print('{} disabled!'.format(self.name))
         self.run_line = False
 
     def handle_action(self, action_type):
