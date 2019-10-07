@@ -59,7 +59,7 @@ class _chip(PygameObj):
         PygameObj.__init__(self, center, width, height, color_map, shapes)
 
         try:
-            CylonAST = open('Classes/YoPy/{}.txt'.format(name), 'r')
+            CylonAST = open('Classes/YoPy/{}.txt'.format(name), 'r+')
             YoPy = open('Classes/YoPy/YoPy_{}.py'.format(name), 'w+')
             print('Found: {}.txt'.format(name))
         except Exception:

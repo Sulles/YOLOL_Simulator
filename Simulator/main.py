@@ -47,6 +47,8 @@ def simulator():
     # Initialize Network here
     selected_network = 0
     all_networks = []
+
+    # Create Test Network 1
     network_settings = {'Lamp':
                             {'name': 'lamp_1',
                              'state': 1,
@@ -58,23 +60,27 @@ def simulator():
                              'color_map': [colors['RED'], colors['GREEN']]},
                         'Chip':
                             {'name': 'test_chip',
+                             'state': 0,
                              'center': [DISPLAY['width'] / 2 - 120, DISPLAY['height'] / 2 + 100]}
                         }
     all_networks.append(Network('test_network_1', network_settings))
-    network_settings = {'Lamp':
-                            {'name': 'lamp_2',
-                             'state': 1,
-                             'center': [DISPLAY['width'] / 2 + 80, DISPLAY['height'] / 2]},
-                        'Button0':
-                            {'name': 'button_2',
-                             'state': 0,
-                             'center': [DISPLAY['width'] / 2 + 100, DISPLAY['height'] / 2 + 50],
-                             'color_map': [colors['RED'], colors['GREEN']]},
-                        'Chip':
-                            {'name': 'test_chip',
-                             'center': [DISPLAY['width'] / 2 + 120, DISPLAY['height'] / 2 + 100]}
-                        }
-    all_networks.append(Network('test_network_2', network_settings))
+
+    # # Create Test Network 2
+    # network_settings = {'Lamp':
+    #                         {'name': 'lamp_2',
+    #                          'state': 1,
+    #                          'center': [DISPLAY['width'] / 2 + 80, DISPLAY['height'] / 2]},
+    #                     'Button0':
+    #                         {'name': 'button_2',
+    #                          'state': 0,
+    #                          'center': [DISPLAY['width'] / 2 + 100, DISPLAY['height'] / 2 + 50],
+    #                          'color_map': [colors['RED'], colors['GREEN']]},
+    #                     'Chip':
+    #                         {'name': 'test_chip',
+    #                          'state': 0,
+    #                          'center': [DISPLAY['width'] / 2 + 120, DISPLAY['height'] / 2 + 100]}
+    #                     }
+    # all_networks.append(Network('test_network_2', network_settings))
     for network in all_networks:
         selected_network = gui.add_network(network)
 
@@ -94,13 +100,15 @@ def simulator():
                 if event.key == K_ESCAPE:
                     # Show main screen
                     print('Got escape!')
-                    if gui.creating_network:
+                    if gui.creating_network or gui.deleting_network:
                         print('currently creating a network')
                         gui.handle_action('ESCAPE')
                     else:
                         print('option screen is handling escape now')
                         option_screen.handle_action('ESCAPE')
                         # option_screen.print()
+                elif gui.creating_network:
+                    gui.handle_action('KEYDOWN', key=event.key)
 
             # MOUSE BUTTON DOWN
             elif event.type == MOUSEBUTTONDOWN:
@@ -114,7 +122,7 @@ def simulator():
                             option_screen.handle_action('RIGHT_MOUSE_DOWN', event.pos)
                     else:
                         selected_obj = all_networks[selected_network].get_closest_obj(event.pos)
-                        print('Got closest obj with name: "%s"' % selected_obj.name)
+                        print('Got closest obj with name: {}'.format(selected_obj.name))
 
                 # LEFT CLICK
                 elif event.button == 1:
@@ -122,17 +130,25 @@ def simulator():
                     if option_screen.is_active:
                         response = None
                         if gui.creating_network:
-                            gui.handle_action('LEFT_MOUSE_DOWN', event.pos)
+                            response = gui.handle_action('LEFT_MOUSE_DOWN', event.pos)
                         else:
                             response = option_screen.handle_action('LEFT_MOUSE_DOWN', event.pos)
 
                         if response is not None:
                             if response['type'] == 'terminate':
                                 terminate()
-                            elif response['type'] == 'add network':
-                                gui.creating_network = True
-                                # TODO: wrap up here
-                                # all_networks.append(create_new_network())
+                            elif response['type'] == 'add_network':
+                                gui.start_create_network()
+                                print('turning on gui.creating_network')
+                            elif response['type'] == 'new_network':
+                                option_screen.is_active = False
+                                all_networks.append(Network(response['network_name'], response['network_settings']))
+                                gui.add_network(all_networks[-1])
+                                selected_network = len(all_networks) - 1
+                            elif response['type'] == 'start_delete_network':
+                                option_screen.is_active = False
+                                gui.start_delete_network()
+                                print('Starting delete network process...')
                             else:
                                 option_screen.show_incomplete_feature()
                     # not option screen, interact with all objects as normal
@@ -144,6 +160,12 @@ def simulator():
                                 network.handle_action('LEFT_MOUSE_DOWN', event.pos)
                         elif response['type'] == 'active_tab':
                             selected_network = response['active_tab_index']
+                        elif response['type'] == 'deleted_network':
+                            for network in all_networks:
+                                if network.name == response['network_name']:
+                                    all_networks.remove(network)
+                            print('Removed network: {}'.format(response['network_name']))
+
 
             # MOUSE BUTTON UP
             elif event.type == MOUSEBUTTONUP:
@@ -154,7 +176,8 @@ def simulator():
                 # LEFT CLICK
                 if event.button == 1:
                     if not option_screen.is_active and not gui.creating_network:
-                        all_networks[selected_network].handle_action('LEFT_MOUSE_UP', event.pos)
+                        for network in all_networks:
+                            network.handle_action('LEFT_MOUSE_UP', event.pos)
 
         # Follow mouse
         if selected_obj:
@@ -167,6 +190,9 @@ def simulator():
         if gui.creating_network:
             gui.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             gui.draw_create_network(surface)
+        elif gui.deleting_network:
+            gui.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
+            gui.draw_delete_network(surface)
         elif option_screen.is_active:
             option_screen.handle_action('MOUSE_HOVER', pygame.mouse.get_pos())
             option_screen.draw(surface)

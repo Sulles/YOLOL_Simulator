@@ -202,8 +202,14 @@ class OptionScreen:
 
         # EDIT NETWORK OPTIONS
         elif self.selected_key == 'Create a new network':
-            print('You want to create a new network! Cool!')
+            # print('You want to create a new network! Cool!')
             return dict(type='add_network')
+        elif self.selected_key == 'Edit objects in a network':
+            print('You want to edit something in a network! Cool!')
+            return dict(type='edit_network')
+        elif self.selected_key == 'Delete a network':
+            print('CHOP CHOP time!')
+            return dict(type='start_delete_network')
 
         else:
             print('what even is the selected key?: {}'.format(self.selected_key))

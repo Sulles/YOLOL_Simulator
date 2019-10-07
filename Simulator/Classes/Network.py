@@ -24,6 +24,7 @@ class Network:
             {"Button": {"name": 'butt_name', "state": 0}}
         This would create a Button with name 'butt_name' and ButtonState 0
         """
+        print('Creating new network: {}...'.format(name))
         self.name = name
         self.update_flag = False
         self.objects = []

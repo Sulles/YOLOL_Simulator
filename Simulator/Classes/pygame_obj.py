@@ -10,7 +10,8 @@ This class houses all the drawing components required for pygame
 TODO: Add other pygame object shapes
 """
 
-# from copy import deepcopy
+from copy import copy
+
 from pygame import Rect as pygame_rect
 from pygame import draw as pygame_draw
 
@@ -78,7 +79,8 @@ class PygameObj:
                          center=center, width=shape['width']))
             elif shape['type'] == 'point_list':
                 self.drawable_shapes.append(
-                    dict(type='shape', color=shape['color'], point_list=self.convert_point_list_to_abs(shape['point_list']),
+                    dict(type='shape', color=shape['color'],
+                         point_list=self.convert_point_list_to_abs(shape['point_list']),
                          width=shape['width']))
 
     def convert_point_list_to_abs(self, point_list):
