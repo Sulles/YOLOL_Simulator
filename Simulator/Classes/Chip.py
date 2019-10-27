@@ -202,6 +202,15 @@ class _chip(PygameObj):
                 new_attribute_map[key] = item
         self.attribute_map = new_attribute_map
 
+    def get_name(self):
+        return copy(self.name)
+
+    def get_info_attributes(self):
+        attrs = list()
+        attrs.append('Chip wait: {}'.format(self.chipwait))
+        attrs.append('Current line: {}'.format(self.current_line))
+        return attrs
+
 
 # This is the main chip class
 # TODO: Add chip-specific functionality and verify code compatibility for each chip type

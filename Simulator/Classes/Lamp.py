@@ -62,6 +62,14 @@ class Lamp(PygameObj):
 
         self.attribute_map = dict(lampon='lampon')
 
+    def get_name(self):
+        return copy(self.name)
+
+    def get_info_attributes(self):
+        attrs = list()
+        attrs.append('lamp on: {}'.format(self.lampon))
+        return attrs
+
     def toggle_on_off(self, on_off=None):
         if on_off is not None:  # if specified ON/OFF state
             if on_off:  # True is ON, False is OFF

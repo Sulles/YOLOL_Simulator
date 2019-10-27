@@ -14,6 +14,7 @@ from copy import copy
 
 from pygame import Rect as pygame_rect
 from pygame import draw as pygame_draw
+from pygame import font
 
 
 class PygameObj:
@@ -44,7 +45,9 @@ class PygameObj:
         self.shape_def = shapes
         self.text = text
         self.font = Font
-        if text is not None and Font is not None:
+        if text is not None:
+            if Font is None:
+                Font = font.Font('src/Cubellan.ttf', 20)
             self.text_render = Font.render(text, True, (255, 255, 255))
             self.text_rect = self.text_render.get_rect()
             self.text_rect.center = self.center
@@ -60,6 +63,12 @@ class PygameObj:
                 shape_def['width'] = 0
 
         self.update_shapes()
+
+    def get_name(self):
+        if self.text is not None:
+            return copy(self.text)
+        else:
+            return ""
 
     def update_shapes(self):
         # clear all shapes

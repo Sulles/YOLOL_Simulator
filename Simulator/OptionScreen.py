@@ -153,7 +153,7 @@ class OptionScreen:
         self.yolol_list = ListObj(self.options_text['Edit YOLOL code'], screen_size, y_offset=-150)
         # TODO: make sure yolol_list can be updated appropriately, will probably need to create a new obj for each
         #  new chip created
-        self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size)
+        self.simulator_list = ListObj(self.options_text['Edit simulator settings'], screen_size, y_offset=-150)
         self.selected_key = None
         self.current_list_obj = None
         self.update_current_list()

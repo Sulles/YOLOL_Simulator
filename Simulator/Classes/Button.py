@@ -127,6 +127,14 @@ class _button(PygameObj):
               "Color: {7}".format(self.name, self.buttonstate, self.buttononstate, self.buttonoffstate, self.center,
                                   self.width, self.height, self.color))
 
+    def get_name(self):
+        return copy(self.name)
+
+    def get_info_attributes(self):
+        attrs = list()
+        attrs.append('Internal state: {}'.format('ON' if self.internal_state else 'OFF'))
+        return attrs
+
 
 # This is the main button class
 class Button(_button):
