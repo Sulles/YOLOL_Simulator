@@ -10,7 +10,6 @@ Please see 'Current Work In Progress' to see what is being worked on, as well as
 
 ### This project uses CYLON AST v0.3.0
 - YOLOL AST Constructor provided by yoloxide: https://github.com/Jerald/yoloxide
-- Current use of this program requires using Discord bot to get CYLON AST, will be automated for 0.1 Release
 
 ## Completed Work
 
@@ -19,20 +18,20 @@ Could use better unit tests, see Known Issues below, needs to be fixed
 
 ### Integrate transpiled Python code generated from Cylon AST into Simulator through YOLOL Chips (100% complete of 100%)
 
-## Current Work In Progress (Planned for 0.1 Release) 92% Complete
+## Current Work In Progress (Planned for 0.1 Release) 95% Complete
 
-### GUI (50% complete of 70%)
+### GUI (55% complete of 70%)
 
 ##### GUI shows all objects in a network (100% complete of 100%)
 ##### Create GUI to create Network with specific components (100% complete of 100%)
 ##### Create GUI to delete a Network (100% complete of 100%)
-##### Create GUI to modify a Network (0% complete of 100%)
+##### Create GUI to modify a Network (70% complete of 100%)
 ##### Create GUI for YOLOL Chip interaction (10% complete of 80%)
 ##### Enable possibility to create custom 'textures' for all components. Need to implement this with setup. (0% complete of 100%)
 ##### Need to create an instructions screen page (0% complete of 100%)
 May just replace this with Github wiki instructions
 
-### Automate YOLOL to CYLON AST to Python (0% complete of 100%)
+### Automate YOLOL to CYLON AST to Python (50% complete of 100%)
 
 ### Python Emulator Object Classes and Network (9.39% complete of 9.4%)
 #### Planned devices for 0.1 Release 
