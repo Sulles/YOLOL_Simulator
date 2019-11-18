@@ -67,7 +67,7 @@ class Lamp(PygameObj):
 
     def get_info_attributes(self):
         attrs = list()
-        attrs.append('lamp on: {}'.format(self.lampon))
+        attrs.append('lamp on = {}'.format(self.lampon))
         return attrs
 
     def toggle_on_off(self, on_off=None):

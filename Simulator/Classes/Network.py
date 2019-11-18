@@ -36,6 +36,22 @@ class Network:
         for obj in self.objects:
             print('Created new object: "%s" with hitbox: %s' % (obj.name, obj.hit_box))
 
+        self.info_tree = dict()
+        self.build_info_tree()
+
+    def build_info_tree(self):
+        """ This method will build the info tree to be displayed in the top-left """
+        for obj in self.objects:
+            self.info_tree[obj.name] = obj.get_info_attributes()
+
+    def update_info_tree(self):
+        """ This method is the updater for the info tree """
+        for obj in self.objects:
+            if obj.name not in self.info_tree.keys():  # if object not in the info tree, add it
+                self.info_tree[obj.name] = obj.get_info_attributes()
+            elif self.info_tree[obj.name] != obj.get_info_attributes():  # if data info attributes are different, update
+                self.info_tree[obj.name] = obj.get_info_attributes()
+
     def print(self):
         print("=== NETWORK INFORMATION ===\n"
               "Name: {0}\n"
@@ -55,7 +71,7 @@ class Network:
             if action_location[0] in range(obj.hit_box[0][0], obj.hit_box[0][1]) and \
                     action_location[1] in range(obj.hit_box[1][0], obj.hit_box[1][1]):
                 response = obj.handle_action(action_type)
-        if response is not None:
+        if type(response) is dict:
             # print('Got response from action: {}'.format(response))
             parsed_response = dict()
             for key, item in response.items():
@@ -64,6 +80,16 @@ class Network:
                 if isinstance(obj, Chip):
                     # print('Updating chip "{0}" with data: {1}'.format(obj.name, parsed_response))
                     obj.update_kwargs(parsed_response)
+        return response
+
+    def draw(self, surface):
+        """
+        This function is called to handle drawing all devices
+        :param surface: Pygame Surface to draw everything on
+        """
+        for obj in self.objects:
+            obj.draw(surface)
+        self.update_info_tree()
 
     def get_closest_obj(self, action_location):
         distance = []
@@ -78,16 +104,11 @@ class Network:
     def distance(a, b):
         return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
-    def draw(self, surface):
-        """
-        This function is called to handle drawing all devices
-        :param surface: Pygame Surface to draw everything on
-        """
-        for obj in self.objects:
-            obj.draw(surface)
-
     def get_objects(self):
         return [copy(_) for _ in self.objects]
+
+    def get_info_tree(self):
+        return copy(self.info_tree)
 
     def step(self):
         """

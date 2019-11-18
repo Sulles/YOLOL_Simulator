@@ -21,3 +21,5 @@ colors = {'LIGHTGRAY': (175, 175, 175),
           'BROWN': (255, 240, 220),
           'DARKBROWN': (200, 190, 170),
           'BGCOLOR': (0, 0, 0)}
+
+FONT_TO_PIXEL_FACTOR = 12

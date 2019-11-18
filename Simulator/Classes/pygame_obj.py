@@ -46,12 +46,13 @@ class PygameObj:
         self.text = text
         self.font = Font
         if text is not None:
-            if Font is None:
-                Font = font.Font('src/Cubellan.ttf', 20)
-            self.text_render = Font.render(text, True, (255, 255, 255))
+            if self.font is None:
+                self.font = font.Font('src/Cubellan.ttf', 20)
+            self.text_render = self.font.render(text, True, (255, 255, 255))
             self.text_rect = self.text_render.get_rect()
             self.text_rect.center = self.center
         else:
+            self.text_rect = None
             self.text_render = None
 
         # Define all shapes as dictionaries. Each shape 'type' has different fields, i.e. a shape type of 'circle' has
@@ -126,24 +127,48 @@ class PygameObj:
 
     draw = _draw
 
-    def update_text(self, text=None, font=None):
-        assert self.text is not None and text is not None, \
+    def update_text(self, text=None, font=None, text_to_width_factor=None):
+        assert self.text is not None or text is not None, \
             'Cannot show text with no text passed as argument and no text in object!'
-        assert self.font is not None and font is not None, \
+        assert self.font is not None or font is not None, \
             'Cannot create text with no font passed as argument and no font in object!'
         if text is not None:
             self.text = text
         if font is not None:
+            self.font = font
             self.text_render = font.render(text, True, (255, 255, 255))
         else:
             self.text_render = self.font.render(self.text, True, (255, 255, 255))
         self.text_rect = self.text_render.get_rect()
         self.text_rect.center = self.center
+        if text_to_width_factor is not None:
+            expected_width = int(text_to_width_factor * len(self.text) + 30)
+            width_diff = expected_width - copy(self.width)
+            self.widen(width_diff)
+            self.update_shapes()
+
+    def widen(self, additional_width):
+        print('Widening "{}" all shapes by: {}'.format(self.text, additional_width))
+        self.width += additional_width
+        for shape in self.shape_def:
+            shape['settings']['width'] += additional_width
+
+    def shift_center(self, center_offset):
+        new_center = [self.center[0] + center_offset[0], self.center[1], + center_offset[1]]
+        self.set_center(new_center)
+        print('New object center: {}'.format(self.center))
 
     def set_center(self, new_center):
+        print('{} current center: {}, new center: {}'.format(self.text, self.center, new_center))
         self.center = [new_center[0], new_center[1]]
         self.update_shapes()
         self.update_hit_box()
+        if self.text_rect is not None:
+            self.text_rect.center = self.center
+            try:
+                self.update_text()
+            except AssertionError:
+                pass
 
     def update_hit_box(self):
         self.hit_box = [[self.center[0] - int(self.width / 2), self.center[0] + int(self.width / 2)],

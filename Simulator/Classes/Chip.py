@@ -163,6 +163,7 @@ class _chip(PygameObj):
             else:
                 print('Got action to stop execution for {}'.format(self.name))
                 self.run_line = False
+            return self.run_line
 
     def _update_kwargs(self, updated_kwargs):
         for key, item in updated_kwargs.items():
@@ -207,8 +208,9 @@ class _chip(PygameObj):
 
     def get_info_attributes(self):
         attrs = list()
-        attrs.append('Chip wait: {}'.format(self.chipwait))
-        attrs.append('Current line: {}'.format(self.current_line))
+        attrs.append('Chip {}'.format("ON" if self.run_line else "OFF"))
+        attrs.append('Chip wait = {}'.format(self.chipwait))
+        attrs.append('Current line = {}'.format(self.current_line))
         return attrs
 
 

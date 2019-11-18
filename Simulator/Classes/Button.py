@@ -92,7 +92,7 @@ class _button(PygameObj):
                 # print('"{0}" changed from {1} to {2}'.format(attr, self.buttonstate, new_value))
                 self.buttonstate = new_value
             elif self.attribute_map[attr] == 'buttononstate':
-                # print('"{0}" changed from {1} to {2}'.format(attr, self.buttononstate, new_value))
+                print('"{0}" changed from {1} to {2}'.format(attr, self.buttononstate, new_value))
                 self.buttononstate = new_value
             elif self.attribute_map[attr] == 'buttonoffstate':
                 # print('"{0}" changed from {1} to {2}'.format(attr, self.buttonoffstate, new_value))
@@ -112,6 +112,7 @@ class _button(PygameObj):
                 print('Updating attribute map for: "{0}" to "{1}"'.format(key, new_name))
                 new_attribute_map[new_name] = item
             else:
+                # TODO: what does this do again?
                 print('Copying over other attributes...')
                 new_attribute_map[key] = item
         self.attribute_map = new_attribute_map
@@ -132,7 +133,11 @@ class _button(PygameObj):
 
     def get_info_attributes(self):
         attrs = list()
-        attrs.append('Internal state: {}'.format('ON' if self.internal_state else 'OFF'))
+        attrs.append('Button style = {}'.format(self.buttonstyle))
+        attrs.append('Internal state = {}'.format(self.internal_state))
+        attrs.append('Current state = {}'.format(self.buttonstate))
+        attrs.append('ON state = {}'.format(self.buttononstate))
+        attrs.append('OFF state = {}'.format(self.buttonoffstate))
         return attrs
 
 

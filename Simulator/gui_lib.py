@@ -7,7 +7,6 @@ Author: Sulles
 This library file houses all the objects required for the GUI. It currently has:
 - ListObj
 - InputExtendedListObj
-TODO: test DisplayExtendedList
 - ErrorObj
 - TabObj
 - TabList
@@ -17,10 +16,12 @@ TODO: create new TextBox
 from copy import copy
 from math import sqrt
 
-from pygame import font as pygame_font
-
+# noinspection PyUnresolvedReferences
 from Classes.pygame_obj import PygameObj
-from src.constants import colors
+from pygame import font as pygame_font
+from pygame import draw as pygame_draw
+# noinspection PyUnresolvedReferences
+from src.constants import colors, FONT_TO_PIXEL_FACTOR
 
 
 def distance(a, b):
@@ -171,64 +172,17 @@ class InputExtendedListObj:
         if action_type == 'LEFT_MOUSE_DOWN':
             active_entry = self.main_list.handle_left_mouse_down(mouse_pos)
             if active_entry is not None:
-                self.entry_value_map[self.entry_names[active_entry]] += 1
+                self.entry_value_map[active_entry] += 1
                 self.update_values()
         elif action_type == 'RIGHT_MOUSE_DOWN':
             active_entry = self.main_list.handle_right_mouse_down(mouse_pos)
             if active_entry is not None:
-                self.entry_value_map[self.entry_names[active_entry]] -= 1
+                self.entry_value_map[active_entry] -= 1
                 self.update_values()
         elif action_type == 'MOUSE_HOVER':
             self.main_list.handle_hover(mouse_pos)
         else:
             return None
-
-
-class DisplayExtendedList:
-    """
-    This object will display the name and info for a list of objects
-    """
-
-    def __init__(self, network, screen_size, width=100, height=30, x_offset=0, y_offset=0):
-        """
-        Constructor
-        :param network: Network object
-        :param screen_size: dictionary with 'width' and 'height' keys
-        :param width: int of intended width of each List object
-        :param height: int of intended height of each List object
-        :param x_offset: int (pixel) x-offset from center of 'screen size'
-        :param y_offset: int (pixel) y-offset from center of 'screen size'
-        """
-        self.network = network
-        self.name_list = [obj.get_name() for obj in network.objects]
-        self.name_obj = ListObj(self.name_list, screen_size, width=width, height=30*len(self.name_list),
-                                x_offset=x_offset, y_offset=y_offset)
-
-        self.info_list = list()
-        self.check_for_attribute_updates()
-        self.info_obj = [ListObj(info_bits, screen_size, width=100, height=30*len(info_bits), x_offset=x_offset + 120,
-                                 y_offset=y_offset) for info_bits in self.info_list]
-
-    def update_attributes_list(self):
-        if self.check_for_attribute_updates():
-            for x in range(len(self.info_list)):
-                self.info_obj[x].update_text(self.info_list[x])
-
-    def check_for_attribute_updates(self):
-        """
-        This function checks if any objects have updated attributes.
-        If changes were detected, self.info_list is updated, the info_obj text is updated, and this function
-            returns True
-        Otherwise returns False
-        :return:
-        """
-        current_info = [obj.get_info_attributes() for obj in self.network.objects]
-        was_change = False
-        for x in range(len(current_info)):
-            if current_info[x] != self.info_list[x]:
-                self.info_list[x] = current_info[x]
-                was_change = True
-        return was_change
 
 
 class ErrorObj(PygameObj):
@@ -310,8 +264,8 @@ class TabList:
             tab.deactivate()
         return self.tabs[-1].activate()
 
-    def get_tab_center(self, index):
-        return copy(self.tabs[index].center)
+    def get_tab_center(self, tab_info):
+        return copy(self.tabs[tab_info['index']].center)
 
     @staticmethod
     def calculate_center(index):
@@ -334,7 +288,6 @@ class TabList:
             tab.draw(surface)
 
     def handle_action(self, action_type, mouse_pos):
-        # TODO: Tabs should not be de-focused when user clicks on something that is not a tab
         if action_type == 'MOUSE_HOVER':
             for tab in self.tabs:
                 tab.handle_mouse_hover(mouse_pos)
@@ -344,23 +297,275 @@ class TabList:
             for tab in self.tabs:
                 print('Checking {}'.format(self.tab_names[self.tabs.index(tab)]))
                 if tab.in_hit_box(mouse_pos):
+                    self.deactivate_all_tabs()
                     tab.activate()
                     activated_tab_name = copy(tab.name)
-                else:
-                    tab.deactivate()
             return activated_tab_name
         return None
 
+    def deactivate_all_tabs(self):
+        for tab in self.tabs:
+            tab.deactivate()
 
-class TextBox:
-    def __init__(self, prompt, center, width=300, height=100, color_map=None, Font=None):
+    def get_active_tab(self):
+        for tab in self.tabs:
+            if tab.is_active:
+                return dict(name=tab.name, index=self.tabs.index(tab))
+        return None
+
+
+class DisplayBox(PygameObj):
+    def __init__(self, text, middle_left, width=None, height=20, center=None, border=True, font=None):
+        """
+        Constructor for basic display box of text
+        :param text: string of text to be displayed
+        :param middle_left: list [x, y] in pixels that corresponds to the 'middle left', aka start, position of the box
+        :param width: default to None and will automatically be adjusted to wrap around entire text
+        :param height: default to 30 pixels
+        :param center: if you want to pass center instead of middle_left... 'cause
+        """
+        self.name = text
+        self.is_selected = False
+        text = text.upper()
+
+        # Handle auto-width
+        if width is None:
+            width = int((len(text) ** 0.8) * FONT_TO_PIXEL_FACTOR)
+
+        # Handle auto-center
+        if center is None:
+            center = [middle_left[0] + int(0.5 * width), middle_left[1]]
+
+        # Handle border vs background for default color_map
+        shape = {'type': 'rect',
+                 'color': None,
+                 'settings': {
+                     'center': [0, 0],
+                     'width': width,
+                     'height': height
+                 }}
+        if border:
+            shape['width'] = 1
+            self.color_map = [colors['WHITE']]
+        else:
+            self.color_map = [colors['BGCOLOR'], colors['BLUE'], colors['DARKGREEN']]
+
+        # Handle font, WARNING: this will mess with auto-width calculations
+        if font is None:
+            font = pygame_font.Font('src/Cubellan.ttf', 10)
+
+        PygameObj.__init__(self, center, width, height, self.color_map, [shape], text=text, Font=font)
+
+    def select(self):
+        self.is_selected = True
+        self.update_color(2)
+
+    def deselect(self):
+        self.is_selected = False
+        self.update_color(0)
+
+    def handle_action(self, action_type, mouse_pos, key=None):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            if self.in_hit_box(mouse_pos) and len(self.color_map) > 1:
+                print('"{}" was selected!'.format(self.name))
+                self.select()
+                return 'selected'
+            else:
+                self.deselect()
+        elif action_type == 'MOUSE_HOVER' and len(self.color_map) > 1:
+            if self.in_hit_box(mouse_pos):
+                self.update_color(1)
+            elif not self.is_selected:
+                self.update_color(0)
+        return None
+
+
+class CheckBox(PygameObj):
+    def __init__(self, center, text, color_map=None, width=None, height=50, font=None):
+        """
+        Constructor for a generic check box to all the user to 'submit' something
+        :param text: String to display
+        :param center: list [x, y] pixel location of check_box
+        :param width: pixel width of check_box
+        :param height: pixel height of check_box
+        """
+        self.name = text
+        if color_map is None:
+            color_map = [colors['BGCOLOR'], colors['DARKGREEN']]
+        if font is None:
+            font = pygame_font.Font('src/Cubellan.ttf', 16)
+        if width is None:
+            width = int((len(text) ** 0.8) * FONT_TO_PIXEL_FACTOR * 1.5)
+        PygameObj.__init__(self, center, width, height, color_map,
+                           [{'type': 'rect',
+                             'color': None,
+                             'settings': {
+                                 'center': [0, 0],
+                                 'width': width,
+                                 'height': height}}],
+                           text, Font=font)
+
+    def handle_action(self, action_type, mouse_pos, key=None):
+        if action_type == 'LEFT_MOUSE_DOWN':
+            if self.in_hit_box(mouse_pos):
+                print('"{}" was selected!'.format(self.name))
+                return 'selected'
+        elif action_type == 'MOUSE_HOVER':
+            if self.in_hit_box(mouse_pos):
+                self.update_color(1)
+            else:
+                self.update_color(0)
+        return None
+
+
+class InputBox(PygameObj):
+    def __init__(self, center, width=30, height=30, color_map=None, font=None, font_to_pixel=None):
+        """
+        Constructor for the TextBox object
+        :param center: list of length 2, [x, y] in pixels
+        :param width: int of pixel width, default to None and will adjust to length of prompt
+        :param height: int of pixel height
+        :param color_map: list of colors
+        :param font: Pygame font for displaying text
+        :param font_to_pixel: text-to-pixel offset
+        """
+        color_map = [colors['BGCOLOR'], colors['DARKGRAY']] if color_map is None else color_map
+        self.font = pygame_font.Font('src/Cubellan.ttf', 16) if font is None else font
+        PygameObj.__init__(self, center, width, height, color_map,
+                           [{'type': 'rect',
+                             'color': None,
+                             'settings': {
+                                 'center': [0, 0],
+                                 'width': width,
+                                 'height': height}}],
+                           text="", Font=font)
+        self.is_active = False
+        self.text = ""
+        self.font_to_pixel = 6.5 if font_to_pixel is None else font_to_pixel
+
+    def activate(self):
+        self.is_active = True
+        self.update_color(1)
+        return dict(type='activated')
+
+    def deactivate(self):
+        self.is_active = False
+        self.update_color(0)
+        return dict(type='deactivated')
+
+    def add_key(self, key):
+        if key == 8:  # if delete, remove last character
+            self.text = self.text[:-1]
+        elif (65 <= key <= 90) or (97 <= key <= 122):
+            key = chr(key)
+            self.text += key
+        else:
+            print('Unsupported character: {}'.format(chr(key)))
+            return
+        new_width = int(len(self.text) * self.font_to_pixel) + 30
+        half_width_diff = int((new_width - self.width) / 2)
+        print('Current text: {}'.format(self.text))
+        self.update_text(self.text, self.font)
+        self.widen(half_width_diff * 2)
+        self.shift_center([half_width_diff, 0])
+        return dict(type='shift_center', shift=[half_width_diff * 2, 0])
+
+    def handle_action(self, action_type, mouse_pos, key=None):
+        if action_type == 'MOUSE_HOVER':
+            if self.in_hit_box(mouse_pos):
+                self.update_color(1)
+            elif not self.is_active:
+                self.update_color(0)
+        elif action_type == 'LEFT_MOUSE_DOWN':
+            if self.in_hit_box(mouse_pos):
+                return self.activate()
+            else:
+                return self.deactivate()
+        elif action_type == 'KEY_DOWN' and self.is_active:
+            print('got key: {}'.format(chr(key)))
+            return self.add_key(key)
+        return None
+
+
+class ModifyTextBox:
+    def __init__(self, prompt, center, width=None, height=50, font=None):
         """
         Constructor for the TextBox object
         :param prompt: string of prompt for user input
         :param center: list of length 2, [x, y] in pixels
-        :param width: int of pixel width
+        :param width: int of pixel width, default to None and will adjust to length of prompt
         :param height: int of pixel height
-        :param color_map: list of colors
-        :param Font: pygame Font object for displaying text
         """
-        pass
+        self.height = height
+
+        print('center: {}'.format(center))
+        if font is None:
+            font = pygame_font.Font('src/Cubellan.ttf', 14)
+
+        # Display current text
+        self.objects = list()
+        if width is None:
+            width = int((len(prompt) ** 0.8) * FONT_TO_PIXEL_FACTOR * 1.2)
+        self.objects.append(DisplayBox(prompt, None, width, height, center, border=False, font=font))
+
+        # Setup input box
+        center[0] += int(width / 2) + 25
+        print('center: {}'.format(center))
+        self.objects.append(InputBox(center, font=font))
+
+        # Build check box
+        self.submit_width = int((len('Submit') ** 0.8) * FONT_TO_PIXEL_FACTOR * 1.2)
+        center[0] += 30 + int(self.submit_width / 2)
+        print('center: {}'.format(center))
+        self.objects.append(CheckBox(center, 'Submit', height=30, font=font))
+
+        self.font_to_pixel = 6.5
+
+    def draw(self, surface):
+        self.draw_rect(surface)
+        for obj in self.objects:
+            obj.draw(surface)
+
+    def draw_rect(self, surface):
+        top_left = [self.objects[0].center[0] - int(self.objects[0].width / 2) - 1,
+                    self.objects[0].center[1] + int(self.height / 2) + 1]
+        top_right = [self.objects[2].center[0] + int(self.objects[2].width / 2) + 2,
+                     self.objects[2].center[1] + int(self.height / 2) + 1]
+        bottom_right = [top_right[0], top_right[1] - self.height - 2]
+        bottom_left = [top_left[0], top_left[1] - self.height - 2]
+        pygame_draw.lines(surface, colors['WHITE'], True, [top_left, top_right, bottom_right, bottom_left])
+
+    def handle_submission(self):
+        # get new text
+        text = copy(self.objects[1].text)
+
+        # clear old text and shift back input & submit boxes
+        self.objects[1].update_text("", text_to_width_factor=self.font_to_pixel)
+        self.objects[1].shift_center([int(-self.font_to_pixel / 2 * len(text)), 0])
+        self.objects[2].shift_center([int(-self.font_to_pixel * len(text)), 0])
+
+        # git diff of display text width
+        old_display_width = self.objects[0].width
+        new_display_width = int(self.font_to_pixel * len(text) + 30)
+        width_diff = new_display_width - old_display_width
+
+        # Pass text to display box
+        self.objects[0].update_text(text, text_to_width_factor=self.font_to_pixel)
+
+        # shift input & submit boxes based off of new width diff / 2
+        self.objects[1].shift_center([int(width_diff / 2), 0])
+        self.objects[2].shift_center([int(width_diff / 2), 0])
+
+    def handle_action(self, action_type, mouse_pos, key=None):
+        for obj in self.objects:
+            response = obj.handle_action(action_type, mouse_pos, key)
+            if type(response) is dict and 'type' in response.keys():
+                if response['type'] == 'shift_center':
+                    self.objects[-1].shift_center(response['shift'])
+                elif response['type'] == 'activated':
+                    self.objects[0].select()
+                elif response['type'] == 'deactivated':
+                    self.objects[0].deselect()
+            elif response == 'selected':
+                if obj.name == 'Submit':
+                    self.handle_submission()
